@@ -3,9 +3,9 @@ using UnityEngine;
 public class neuralNetwork : MonoBehaviour
 {
     //how many neurons in each layer
-    int[] layerSizes = {4, 8, 6, 5, 8, 4};
+    int[] layerSizes = {4, 8000, 6000, 5000, 8000, 49152};
     //values of neurons (not including output)
-    int[][] neurons;
+    float[][] neurons;
     //connections of neuron layers
     float[][][] weights;
 
@@ -23,15 +23,18 @@ public class neuralNetwork : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+
+        ///////////////////////////////////////////////////////////////// initialization /////////////////////////////////////////////////////////////////
         //initialize neurons with x layers 
-        neurons = new int[layerSizes.Length][];
+        neurons = new float[layerSizes.Length][];
         for(int i = 0; i < layerSizes.Length; i++)
         {
             //initialize each layer with y neurons
-            neurons[i] = new int[layerSizes[i]];
-            i++;
+            neurons[i] = new float[layerSizes[i]];
         }
-        
+
+        neurons[0] = new float[] {0.5f, -0.53f, 0.84f, -0.2f};
+
 
 
         //initialize weights with x layers and set them randomly
@@ -55,16 +58,16 @@ public class neuralNetwork : MonoBehaviour
                     //(uses Xavier/Glorot initialization to scale for different layer sizes)
                     float maxWeight = Mathf.Sqrt(6.0f / (layerSizes[layerNum] + layerSizes[layerNum + 1]));
                     weights[layerNum][neuronNum][weightNum] = Random.Range(maxWeight, -maxWeight);
-                    print(weights[layerNum][neuronNum][weightNum]);
+                    //print(weights[layerNum][neuronNum][weightNum]);
                 }
             }
         }
 
 
- 
 
 
-        //display neurons and lines
+        ///////////////////////////////////////////////////////////////// display /////////////////////////////////////////////////////////////////
+        /*display neurons and lines
         for (int x = 0; x < layerSizes.Length; x++)
         {
             for(int y = 0; y < layerSizes[x] ;y++)
@@ -84,12 +87,48 @@ public class neuralNetwork : MonoBehaviour
             }
         }
 
+
+        *///////////////////////////////////////////////////////////////// processing /////////////////////////////////////////////////////////////////
+        for(int layerNumb = 0; layerNumb < layerSizes.Length-1; layerNumb++)
+        {
+            //for each neuron in the next layer
+            for(int neuronNumb = 0; neuronNumb < layerSizes[layerNumb+1]; neuronNumb++)
+            {
+                for(int prevNueronNumb = 0; prevNueronNumb < layerSizes[layerNumb]; prevNueronNumb++)
+                {
+                    neurons[layerNumb + 1][neuronNumb] += (neurons[layerNumb][prevNueronNumb] * weights[layerNumb][prevNueronNumb][neuronNumb]);
+                }
+
+                neurons[layerNumb + 1][neuronNumb] = 1 / (1 + Mathf.Pow(2.718281828459045f, -neurons[layerNumb + 1][neuronNumb]));
+                //print($"({layerNumb + 1}, {neuronNumb}): {neurons[layerNumb + 1][neuronNumb]}");
+            }
+        }
+
+
+        ///////////////////////////////////////////////////////////////// creating image ////////////////////////////////////////////////////////////////
+        
+        Texture2D texture = new Texture2D(128, 128, TextureFormat.RGBA32, false);
+        texture.filterMode = FilterMode.Point;
+        texture.wrapMode = TextureWrapMode.Clamp;
+
+        Color[] pixels = new Color[16384];
+        for(int i = 0; i < 16384; i++)
+        {
+            pixels[i] = new Color(returnOutput(i * 3), returnOutput(1 + i * 3), returnOutput(2 + i * 3));
+        }
+        texture.SetPixels(pixels);
+        texture.Apply();
+        GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f), 10.0f);
+
     }
 
 
 
 
-
+    float returnOutput(int num)
+    {
+        return neurons[layerSizes.Length - 1][num];
+    }
 
     void drawLine(Vector3 start, Vector3 end, float color)
     {
