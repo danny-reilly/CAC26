@@ -7,7 +7,7 @@ public class neuralNetwork : MonoBehaviour
     //values of neurons (not including output)
     int[][] neurons;
     //connections of neuron layers
-    int[][][] weights;
+    float[][][] weights;
 
     public Transform point1;
     public Transform point2;
@@ -34,23 +34,34 @@ public class neuralNetwork : MonoBehaviour
         
 
 
-        //initialize weights with x layers
-        weights = new int[layerSizes.Length-1][][];
+        //initialize weights with x layers and set them randomly
+        weights = new float[layerSizes.Length-1][][];
         for(int layerNum = 0; layerNum < layerSizes.Length-1; layerNum++)
         {
             //intitialize each layer with y neurons
-            weights[layerNum] = new int[layerSizes[layerNum]][];
+            weights[layerNum] = new float[layerSizes[layerNum]][];
 
             //initialize each neuron with z weights
             //z = amount of neurons in next layer
             for (int neuronNum = 0; neuronNum < layerSizes[layerNum]; neuronNum++)
             {
-                weights[layerNum][neuronNum] = new int[layerSizes[layerNum+1]];
+                weights[layerNum][neuronNum] = new float[layerSizes[layerNum+1]];
+
+
+
+                //set weights to random value
+                for(int weightNum = 0; weightNum < layerSizes[layerNum+1]; weightNum++)
+                {
+                    //(uses Xavier/Glorot initialization to scale for different layer sizes)
+                    float maxWeight = Mathf.Sqrt(6.0f / (layerSizes[layerNum] + layerSizes[layerNum + 1]));
+                    weights[layerNum][neuronNum][weightNum] = Random.Range(maxWeight, -maxWeight);
+                    print(weights[layerNum][neuronNum][weightNum]);
+                }
             }
         }
 
 
-        //set weights to random value
+ 
 
 
         //display neurons and lines
@@ -58,7 +69,7 @@ public class neuralNetwork : MonoBehaviour
         {
             for(int y = 0; y < layerSizes[x] ;y++)
             {
-                print(x + ", " + y);
+                //print(x + ", " + y);
                 GameObject newNeuron = Instantiate(neuron);
                 newNeuron.transform.position = new Vector2(-8 + 16 * ((float)x / layerSizes.Length),  -5 +   10 * ((float)(y+1) / (layerSizes[x]+1)) );
 
@@ -66,7 +77,7 @@ public class neuralNetwork : MonoBehaviour
                 {
                     for (int z = 0; z < layerSizes[x + 1]; z++)
                     {
-                        drawLine(getPos(x, y), getPos(x + 1, z));
+                        drawLine(getPos(x, y), getPos(x + 1, z), weights[x][y][z]);
                     }
                 }
 
@@ -80,11 +91,14 @@ public class neuralNetwork : MonoBehaviour
 
 
 
-    void drawLine(Vector3 start, Vector3 end)
+    void drawLine(Vector3 start, Vector3 end, float color)
     {
         GameObject newLine = Instantiate(lr);
         Vector3[] pos = new Vector3[] {start, end};
         lr.GetComponent<LineRenderer>().SetPositions(pos);
+        lr.GetComponent<LineRenderer>().startColor = new Color(color, color, color);
+        lr.GetComponent<LineRenderer>().endColor = new Color(color, color, color);
+
     }
 
     Vector3 getPos(int x, int y)
