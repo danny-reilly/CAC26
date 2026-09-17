@@ -3,11 +3,19 @@ using UnityEngine;
 public class neuralNetwork : MonoBehaviour
 {
     //how many neurons in each layer
-    int[] layerSizes = {4, 8, 8, 5, 8, 5};
+    int[] layerSizes = {4, 8, 6, 5, 8, 4};
     //values of neurons (not including output)
     int[][] neurons;
     //connections of neuron layers
     int[][][] weights;
+
+    public Transform point1;
+    public Transform point2;
+
+    public GameObject neuron;
+    public GameObject lr;
+
+    private LineRenderer line;
 
     //neurons[x][y], x = layer num, y = which neuron in layer
     //weights[x][y][z], x = layer num, y = which neuron in layer, z = what neuron in the next layer its connected to
@@ -41,17 +49,47 @@ public class neuralNetwork : MonoBehaviour
             }
         }
 
-        for(int x = 0; x < weights.Length; x++)
+
+        //set weights to random value
+
+
+        //display neurons and lines
+        for (int x = 0; x < layerSizes.Length; x++)
         {
-            for (int y = 0; y < weights[x].Length; y++)
+            for(int y = 0; y < layerSizes[x] ;y++)
             {
-                for (int z = 0; z < weights[x][y].Length; z++)
+                print(x + ", " + y);
+                GameObject newNeuron = Instantiate(neuron);
+                newNeuron.transform.position = new Vector2(-8 + 16 * ((float)x / layerSizes.Length),  -5 +   10 * ((float)(y+1) / (layerSizes[x]+1)) );
+
+                if (x != layerSizes.Length -1)
                 {
-                    print(x + ", " + y + ", " + z);
+                    for (int z = 0; z < layerSizes[x + 1]; z++)
+                    {
+                        drawLine(getPos(x, y), getPos(x + 1, z));
+                    }
                 }
+
             }
         }
 
+    }
+
+
+
+
+
+
+    void drawLine(Vector3 start, Vector3 end)
+    {
+        GameObject newLine = Instantiate(lr);
+        Vector3[] pos = new Vector3[] {start, end};
+        lr.GetComponent<LineRenderer>().SetPositions(pos);
+    }
+
+    Vector3 getPos(int x, int y)
+    {
+        return new Vector3(-8 + 16 * ((float)x / layerSizes.Length), -5 + 10 * ((float)(y + 1) / (layerSizes[x] + 1)), 0);
     }
 
     // Update is called once per frame
