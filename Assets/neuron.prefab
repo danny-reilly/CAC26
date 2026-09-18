@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4597981347151945547}
   - component: {fileID: 2626724653491832840}
   m_Layer: 0
-  m_Name: danniumHead
+  m_Name: neuron
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
