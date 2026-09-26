@@ -1,23 +1,35 @@
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class generatorSpawner : MonoBehaviour
 {
     public GameObject imageGenerator;
-    bool restarted = false;
-
+    float cd;
+    int genNum = 0;
+    float mutateChance = 3f;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        Time.timeScale = 10f;
         newGen(imageGenerator, true);
+
+
+        var uiDocument = GameObject.Find("UIDocument").GetComponent<UIDocument>();
+        var root = uiDocument.rootVisualElement;
+
+        // Query your slider by its name or type
+        Slider mySlider = root.Q<Slider>("mutateSlider");
+        mySlider.RegisterValueChangedCallback(OnSliderValueChanged);
 
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.T))
+        if(cd < 0)
         {
+            cd = 0.001f;
             float score = 0;
             foreach(Transform gen in transform)
             {
@@ -40,7 +52,10 @@ public class generatorSpawner : MonoBehaviour
                 }
             }
 
-            print(imageGenerator.GetComponent<neuralNetwork>().score);
+            genNum++;
+            GameObject.Find("UIDocument").GetComponent<UIDocument>().rootVisualElement.Q<Label>("genTxt").text = "Generation " + genNum + ": " + Mathf.Round(100*imageGenerator.GetComponent<neuralNetwork>().score/1875f) + "% Match";
+            print(genNum + ": " + imageGenerator.GetComponent<neuralNetwork>().score);
+
             newGen(imageGenerator, false);
 
             foreach (Transform gen in transform)
@@ -51,13 +66,15 @@ public class generatorSpawner : MonoBehaviour
                 }
             }
 
-            restarted = false;
+        } else
+        {
+            cd -= Time.deltaTime;
         }
     }
 
     void newGen(GameObject best, bool start)
     {
-        for (int i = 0; i < 50; i++)
+        for (int i = 0; i < 5; i++)
         {
             GameObject newGen = Instantiate(best);
             neuralNetwork nn = newGen.GetComponent<neuralNetwork>();
@@ -72,15 +89,27 @@ public class generatorSpawner : MonoBehaviour
 
             
 
-            newGen.transform.position = new Vector3(-10 + i * 3.5f, 0, 0);
+            newGen.transform.position = new Vector3(4 + i * 13.5f, 0, 0);
             newGen.transform.parent = transform;
             
             if(!start)
             {
-                newGen.GetComponent<neuralNetwork>().mutateWeights(0.1f);
+                //keep unmutated version of parent in next gen
+                if(i != 0)
+                {
+                    newGen.GetComponent<neuralNetwork>().mutateWeights(mutateChance);
+                }
                 newGen.GetComponent<neuralNetwork>().runNeuralNetwork();
             }
             
         }
     }
+
+
+    private void OnSliderValueChanged(ChangeEvent<float> evt)
+    {
+        mutateChance = evt.newValue;
+        GameObject.Find("UIDocument").GetComponent<UIDocument>().rootVisualElement.Q<Label>("mutateTxt").text = "Mutate Chance: " + mutateChance;
+    }
+
 }

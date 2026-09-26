@@ -3,8 +3,8 @@ using UnityEngine;
 public class neuralNetwork : MonoBehaviour
 {
     //how many neurons in each layer
-    const int imgSize = 10;
-    int[] layerSizes = {4, 800, 800, imgSize*imgSize*3};
+    const int imgSize = 25;
+    int[] layerSizes = {4, 300, 300, imgSize*imgSize*3};
     //values of neurons (not including output)
     public float[][] neurons;
     //connections of neuron layers
@@ -26,7 +26,8 @@ public class neuralNetwork : MonoBehaviour
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
-    {        
+    {  
+        
     }
 
     public void initialize()
@@ -64,7 +65,7 @@ public class neuralNetwork : MonoBehaviour
                 for (int weightNum = 0; weightNum < layerSizes[layerNum + 1]; weightNum++)
                 {
                     //(uses Xavier/Glorot initialization to scale for different layer sizes)
-                    float maxWeight = Mathf.Sqrt(600.0f / (layerSizes[layerNum] + layerSizes[layerNum + 1]));
+                    float maxWeight = Mathf.Sqrt(18.0f / (layerSizes[layerNum] + layerSizes[layerNum + 1]));
                     weights[layerNum][neuronNum][weightNum] = Random.Range(-maxWeight, maxWeight);
                     //print(weights[layerNum][neuronNum][weightNum]);
                 }
@@ -120,10 +121,8 @@ public class neuralNetwork : MonoBehaviour
                     neurons[layerNumb + 1][neuronNumb] += (neurons[layerNumb][prevNueronNumb] * weights[layerNumb][prevNueronNumb][neuronNumb]);
                 }
 
-                if(true)//layerNumb == layerSizes.Length - 2)
-                {
-                    neurons[layerNumb + 1][neuronNumb] = 1 / (1 + Mathf.Pow(2.718281828459045f, -neurons[layerNumb + 1][neuronNumb]));
-                }
+                neurons[layerNumb + 1][neuronNumb] = 1 / (1 + Mathf.Pow(2.718281828459045f, -2*neurons[layerNumb + 1][neuronNumb]));
+
                 //print($"({layerNumb + 1}, {neuronNumb}): {neurons[layerNumb + 1][neuronNumb]}");
             }
         }
@@ -142,7 +141,7 @@ public class neuralNetwork : MonoBehaviour
         }
         texture.SetPixels(pixels);
         texture.Apply();
-        GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f), 1.0f);
+        GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f), imgSize/10f);
 
         //print(score);
 
@@ -188,7 +187,7 @@ public class neuralNetwork : MonoBehaviour
                         int mutateType = Random.Range(0, 3);
                         if(mutateType == 0)
                         {
-                            float maxWeight = Mathf.Sqrt(600.0f / (layerSizes[i] + layerSizes[i + 1]));
+                            float maxWeight = Mathf.Sqrt(18.0f / (layerSizes[i] + layerSizes[i + 1]));
                             weights[i][j][k] = Random.Range(-maxWeight, maxWeight);
                         } else if(mutateType == 1)
                         {
@@ -206,7 +205,8 @@ public class neuralNetwork : MonoBehaviour
 
     float returnOutput(int num)
     {
-        score += neurons[layerSizes.Length - 1][num];
+        score += -Mathf.Abs(neurons[layerSizes.Length - 1][num] - (num / 3 % 23)/23f) + 1;
+
         return neurons[layerSizes.Length - 1][num];
     }
 

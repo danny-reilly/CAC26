@@ -1,0 +1,7 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement style="flex-grow: 1;">
+        <ui:Label text="Generation 0: 0% Match" name="genTxt" style="-unity-text-align: upper-left; width: 231px; height: 76px; color: rgb(177, 255, 207); font-size: 60px; -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/UI%20Toolkit/UnityThemes/UnityDefaultRuntimeTheme.tss?fileID=2230732570650464555&amp;guid=a71a06d9123a3344dbaa4d2d1c2c4a80&amp;type=3#NotInter-Regular&quot;);"/>
+        <ui:Label text="Mutate Chance: 3.0" name="mutateTxt" style="-unity-text-align: upper-left; width: 474px; height: 76px; color: rgb(177, 255, 207); font-size: 40px; -unity-font-style: bold;"/>
+        <ui:Slider label="" value="42" high-value="10.5" fill="true" direction="Horizontal" inverted="false" name="mutateSlider" style="height: 63px; width: 905px; visibility: visible; padding-top: 0; padding-right: 0; font-size: 50px; -unity-font-style: bold; background-color: rgba(0, 0, 0, 0.306); -unity-material: url(&quot;&quot;); justify-content: flex-end; color: rgb(177, 255, 207);"/>
+    </ui:VisualElement>
+</ui:UXML>

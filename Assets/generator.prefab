@@ -28,7 +28,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
@@ -50,6 +50,7 @@ MonoBehaviour:
   neuron: {fileID: 4998477063074612831, guid: 9834dde481e873b418afe244563da438, type: 3}
   lr: {fileID: 9222790769327053992, guid: ec31751329d3eb34dbd82fa86f56285e, type: 3}
   renders: {fileID: 0}
+  score: 0
 --- !u!212 &6436622535079115321
 SpriteRenderer:
   serializedVersion: 2
