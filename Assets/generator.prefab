@@ -51,6 +51,7 @@ MonoBehaviour:
   lr: {fileID: 9222790769327053992, guid: ec31751329d3eb34dbd82fa86f56285e, type: 3}
   renders: {fileID: 0}
   score: 0
+  danniumTexture: {fileID: 2800000, guid: eb0bfe5cb87622f4f9edd1edce271348, type: 3}
 --- !u!212 &6436622535079115321
 SpriteRenderer:
   serializedVersion: 2

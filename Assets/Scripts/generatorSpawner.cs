@@ -7,6 +7,7 @@ public class generatorSpawner : MonoBehaviour
     float cd;
     int genNum = 0;
     float mutateChance = 3f;
+    float timer;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -27,6 +28,7 @@ public class generatorSpawner : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        timer += Time.deltaTime;
         if(cd < 0)
         {
             cd = 0.001f;
@@ -54,7 +56,11 @@ public class generatorSpawner : MonoBehaviour
 
             genNum++;
             GameObject.Find("UIDocument").GetComponent<UIDocument>().rootVisualElement.Q<Label>("genTxt").text = "Generation " + genNum + ": " + Mathf.Round(100*imageGenerator.GetComponent<neuralNetwork>().score/1875f) + "% Match";
-            print(genNum + ": " + imageGenerator.GetComponent<neuralNetwork>().score);
+            if(genNum % 100 == 0)
+            {
+                print("100 gens in " + timer/10 + "s");
+                timer = 0;
+            }
 
             newGen(imageGenerator, false);
 
@@ -74,7 +80,7 @@ public class generatorSpawner : MonoBehaviour
 
     void newGen(GameObject best, bool start)
     {
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 4; i++)
         {
             GameObject newGen = Instantiate(best);
             neuralNetwork nn = newGen.GetComponent<neuralNetwork>();
@@ -85,6 +91,7 @@ public class generatorSpawner : MonoBehaviour
             {
                 nn.weights = best.GetComponent<neuralNetwork>().cloneWeights();
                 nn.neurons = best.GetComponent<neuralNetwork>().cloneNeurons();
+                nn.biases = best.GetComponent<neuralNetwork>().cloneBiases();
             }
 
             

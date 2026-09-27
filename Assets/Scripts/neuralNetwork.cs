@@ -3,12 +3,14 @@ using UnityEngine;
 public class neuralNetwork : MonoBehaviour
 {
     //how many neurons in each layer
-    const int imgSize = 25;
+    const int imgSize = 100;
     int[] layerSizes = {4, 300, 300, imgSize*imgSize*3};
     //values of neurons (not including output)
     public float[][] neurons;
     //connections of neuron layers
     public float[][][] weights;
+    //values of biases
+    public float[][] biases;
 
     public Transform point1;
     public Transform point2;
@@ -20,6 +22,8 @@ public class neuralNetwork : MonoBehaviour
     private LineRenderer line;
 
     public float score;
+
+    public Texture2D danniumTexture;
 
     //neurons[x][y], x = layer num, y = which neuron in layer
     //weights[x][y][z], x = layer num, y = which neuron in layer, z = what neuron in the next layer its connected to
@@ -42,7 +46,7 @@ public class neuralNetwork : MonoBehaviour
             neurons[i] = new float[layerSizes[i]];
         }
 
-        neurons[0] = new float[] { 0.5f, -0.53f, 0.84f, -0.2f };
+        neurons[0] = new float[] { 0.5f, 0.53f, 0.84f, 0.2f};
 
 
 
@@ -69,6 +73,21 @@ public class neuralNetwork : MonoBehaviour
                     weights[layerNum][neuronNum][weightNum] = Random.Range(-maxWeight, maxWeight);
                     //print(weights[layerNum][neuronNum][weightNum]);
                 }
+            }
+        }
+
+        //initialize biases
+        biases = new float[layerSizes.Length - 1][];
+        for (int layerNum = 0; layerNum < layerSizes.Length - 1; layerNum++)
+        {
+            //intitialize each layer with y neurons
+            biases[layerNum] = new float[layerSizes[layerNum+1]];
+
+            //initialize each neuron with z weights
+            //z = amount of neurons in next layer
+            for (int neuronNum = 0; neuronNum < layerSizes[layerNum+1]; neuronNum++)
+            {
+                biases[layerNum][neuronNum] = Random.Range(-0.1f, 0.1f);
             }
         }
 
@@ -116,14 +135,19 @@ public class neuralNetwork : MonoBehaviour
             //for each neuron in the next layer
             for (int neuronNumb = 0; neuronNumb < layerSizes[layerNumb + 1]; neuronNumb++)
             {
+                //add each neuron*weight from previous layer to new layer neuron
                 for (int prevNueronNumb = 0; prevNueronNumb < layerSizes[layerNumb]; prevNueronNumb++)
                 {
                     neurons[layerNumb + 1][neuronNumb] += (neurons[layerNumb][prevNueronNumb] * weights[layerNumb][prevNueronNumb][neuronNumb]);
                 }
 
+                //add bias to new layer neuron and ReLU
+                neurons[layerNumb + 1][neuronNumb] += biases[layerNumb][neuronNumb];
                 neurons[layerNumb + 1][neuronNumb] = 1 / (1 + Mathf.Pow(2.718281828459045f, -2*neurons[layerNumb + 1][neuronNumb]));
-
-                //print($"({layerNumb + 1}, {neuronNumb}): {neurons[layerNumb + 1][neuronNumb]}");
+                if (layerNumb != layerSizes.Length - 2)
+                {
+                    //neurons[layerNumb + 1][neuronNumb] = Mathf.Max(0, neurons[layerNumb + 1][neuronNumb]);
+                }
             }
         }
 
@@ -180,32 +204,48 @@ public class neuralNetwork : MonoBehaviour
         {
             for(int j = 0; j < weights[i].Length; j++)
             {
-                for(int k = 0; k < weights[i][j].Length; k++)
+                if (Random.Range(0.0f, 100.0f) < mutateChance)
+                {
+                    biases[i][j] = mutate(biases[i][j], i);
+                }
+                for (int k = 0; k < weights[i][j].Length; k++)
                 {
                     if(Random.Range(0.0f, 100.0f) < mutateChance)
                     {
-                        int mutateType = Random.Range(0, 3);
-                        if(mutateType == 0)
-                        {
-                            float maxWeight = Mathf.Sqrt(18.0f / (layerSizes[i] + layerSizes[i + 1]));
-                            weights[i][j][k] = Random.Range(-maxWeight, maxWeight);
-                        } else if(mutateType == 1)
-                        {
-                            weights[i][j][k] *= -1;
-                        } else
-                        {
-                            weights[i][j][k] += Random.Range(-0.02f, 0.02f);
-                        }
+                        weights[i][j][k] = mutate(weights[i][j][k], i);
                     }
                 }
             }
         }
     }
 
+    float mutate(float value, int i)
+    {
+        int mutateType = Random.Range(0, 3);
+        if (mutateType == 0)
+        {
+            float maxWeight = Mathf.Sqrt(18.0f / (layerSizes[i] + layerSizes[i + 1]));
+            value = Random.Range(-maxWeight, maxWeight);
+        }
+        else if (mutateType == 1)
+        {
+            value *= -1;
+        }
+        else
+        {
+            value += Random.Range(-0.02f, 0.02f);
+        }
+        return value;
+    }
+
 
     float returnOutput(int num)
     {
-        score += -Mathf.Abs(neurons[layerSizes.Length - 1][num] - (num / 3 % 23)/23f) + 1;
+        Color targetColor = danniumTexture.GetPixel((num / 3) % imgSize, ((num / 3) / imgSize));
+        float targetValue = (num % 3 == 0) ? targetColor.r : (num % 3 == 1) ? targetColor.g : targetColor.b;
+        score += -Mathf.Pow(Mathf.Abs(neurons[layerSizes.Length - 1][num] - targetValue), 0.7f) + 1;
+        
+        //-Mathf.Abs(neurons[layerSizes.Length - 1][num] - (num / 3 % 23)/23f) + 1;
 
         return neurons[layerSizes.Length - 1][num];
     }
@@ -247,6 +287,17 @@ public class neuralNetwork : MonoBehaviour
         for (int i = 0; i < neurons.Length; i++)
         {
             clone[i] = (float[])neurons[i].Clone();
+        }
+        return clone;
+    }
+
+
+    public float[][] cloneBiases()
+    {
+        float[][] clone = new float[biases.Length][];
+        for (int i = 0; i < biases.Length; i++)
+        {
+            clone[i] = (float[])biases[i].Clone();
         }
         return clone;
     }
