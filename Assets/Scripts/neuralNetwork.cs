@@ -122,7 +122,7 @@ public class neuralNetwork : MonoBehaviour
     public void runNeuralNetwork()
     {
         score = 0;
-        //print(transform.name);
+        //clears neuron list to recalculate neurons
         for (int i = 1; i < neurons.Length; i++)
         {
             System.Array.Clear(neurons[i], 0, neurons[i].Length);
@@ -265,6 +265,7 @@ public class neuralNetwork : MonoBehaviour
     {
         return new Vector3(-8 + 16 * ((float)x / layerSizes.Length), -5 + 10 * ((float)(y + 1) / (layerSizes[x] + 1)), 0);
     }
+
 
 
     public float[][][] cloneWeights()
