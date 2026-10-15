@@ -19,6 +19,7 @@ public class backpropNN : MonoBehaviour
 
             nn.runNeuralNetwork();
             print("Gen " + a + ": " + nn.getOutput()[0]);
+            //nn.changeInputs(inputs);
             nn.backprop();
         }
 
@@ -125,6 +126,14 @@ public class nn
             {
                 biases[layerNum][neuronNum] = Random.Range(-1.0f, 1.0f);
             }
+        }
+    }
+
+
+    public void changeInputs(float[] inputs) {
+        this.inputs = inputs;
+        for(int i = 0; i < neurons[0].Length; i++) {
+            neurons[o][i] = inputs;
         }
     }
 
