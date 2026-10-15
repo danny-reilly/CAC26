@@ -4,30 +4,34 @@ using System.Collections.Generic;
 public class MNISTReadTest : MonoBehaviour
 {
 
-    // Of course, all of the below is a formatted CSV, and by default it is just a string
+    // Of course, all of the below is a formatted CSV, and by default it is just a string, commas separating collums and newlines separating rows
 
-    // MNIST (in CSV format) is basically 1 big table like a google sheet where the first collumn is the label (what number the image should be) and the last 784 are the binary value of the image.
+    // MNIST (in CSV format) is basically 1 big table like a google sheet where the first collumn is the label (what number the image should be) and the last 784 are the 0-255 representing the brightness of the pixel.
     // In the last 784 collumns, the format iterates between the pixels like (1, 1) (1, 2) (1, 3) ........ (1, 28) (2, 1) (2, 2) all the way to (28, 28)
 
     public TextAsset baseData;
-    
+    public int label;
+    public int[] vals;
+
     void Start()
     {
-        string[] lines = baseData.text.Split(",");
-        for(int i = 0; 1<10; i++)
+        string[] rows = baseData.text.Split("\n"); // list with each index being a 785 long string with comma separators, first row is headings
+    }
+
+    public void GetLabelAndVals(int *labelPtr, int[] *valsPtr, int index) // pointer allows you to reference the var you pass in
+    {
+        string[] currentRow = rows[index+1].Split(","); // +1 accounts for heading row
+
+        int localLabel;
+        int.TryParse(currentRow[0], out localLabel);
+        int[] localVals = new int[784];
+
+        for(int i = 0; i < currentRow.Length-1; i++)
         {
-            print(lines[i]);
+            int.TryParse(currentRow[i+1], out localVals[i]);
         }
-    }
 
-    void Update()
-    {
-        
+        *labelPtr = localLabel;
+        *valsPtr = localVals;
     }
-
-    /*public int[][] GetImageWithLabel(int index) // index goes top to bottom in the order of rows, with the first row being a heading row 
-    {
-        string[] values = new string[];
-        for (i = index+1;)
-    }*/
 }
