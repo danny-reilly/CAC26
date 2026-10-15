@@ -2,42 +2,67 @@ using UnityEngine;
 
 public class backpropNN : MonoBehaviour
 {
+    static float[] inputs = { 0.3f, -0.8f, 0.4f, 1f, 0.02f, 0.52f };
+    static int[] hiddenLayers = {20, 25, 20, 15};
+    static float[] goals = {0.4f, 0.2f, 0.3f, 0.4f};
+    static float learnRate = 0.4f;
+
+    nn nn = new nn(inputs, hiddenLayers, goals, learnRate);
+
+    public void Start()
+    {
+
+        nn.initialize();
+
+        for (int a = 0; a < 100; a++)
+        {
+
+            nn.runNeuralNetwork();
+            print("Gen: " + a + " - " + nn.getOutput()[0]);
+            nn.backprop();
+        }
+
+    }
+}
+
+public class nn
+{
     //how many neurons in each layer
-    //const int imgSize = 100;
-    int[] layerSizes = { 30, 20, 31, 32, 33, 30};
+    int[] layerSizes;
+    float[] inputs;
     //values of neurons (not including output)
     float[][] neurons;
     //connections of neuron layers
     float[][][] weights;
     //values of biases
     float[][] biases;
-    //derivatives of C/a
 
     float[][] neuronsPreActivation;
     float[][] neuronDerivs;
 
-    float[] goals = { 0.1f, 0.67f, 0.67f, 0.67f, 0.67f, 0.67f, 0.67f, 0.67f, 0.67f, 0.67f, 0.67f, 0.67f, 0.67f, 0.67f, 0.67f, 0.67f, 0.67f, 0.67f, 0.67f, 0.67f, 0.67f, 0.67f, 0.67f, 0.67f, 0.67f, 0.67f, 0.67f, 0.67f, 0.67f, 0.67f, 0.67f};
+    float[] goals;
 
-    float learnRate = 0.2f;
+    
+    //how fast gradient decent happens (if it's too high or low, it will go towards infinity or not move and never reach the expected value)
+    float learnRate;
 
     //neurons[x][y], x = layer num, y = which neuron in layer
     //weights[x][y][z], x = layer num, y = which neuron in layer, z = what neuron in the next layer its connected to
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    public void Start()
+    public nn(float[] inputs, int[] hiddenLayers, float[] goals, float learnRate)
     {
-        initialize();
+        this.inputs = inputs;
+        this.goals = goals;
+        this.learnRate = learnRate;
 
-        for(int a = 0; a < 100; a++)
+        layerSizes = new int[hiddenLayers.Length + 2];
+        layerSizes[0] = inputs.Length;
+        for(int i = 1; i < hiddenLayers.Length+1; i++)
         {
-
-            runNeuralNetwork();
-            print("Gen: " + a + " - " + neurons[layerSizes.Length - 1][0]);
-            backprop();
+            layerSizes[i] = hiddenLayers[i-1]; 
         }
-      
+        layerSizes[hiddenLayers.Length+1] = goals.Length;
     }
-
 
     public void initialize()
     {
@@ -56,11 +81,8 @@ public class backpropNN : MonoBehaviour
 
         for(int i = 0; i < neurons[0].Length; i++)
         {
-            neurons[0][i] = Random.Range(-1.0f, 1.0f);
+            neurons[0][i] = inputs[i];
         }
-        //neuronsPreActivation[0] = new float[] { 0.5f, 0.53f, 0.84f, 0.2f };
-        //neurons[0] = new float[] { 0.5f, 0.53f, 0.84f, 0.2f };
-        //neuronDerivs[0] = new float[] { 0.5f, 0.53f, 0.84f, 0.2f };
 
 
 
@@ -143,19 +165,30 @@ public class backpropNN : MonoBehaviour
                 }
             }
         }
+
+
     }
 
 
     public void backprop()
     {
-        //set last layer neuron derivatives
-        for (int j = 0; j < layerSizes[layerSizes.Length-1]; j++)
+        int lastLayer = layerSizes.Length - 1;
+
+        //clear neuron derivatives
+        for (int l = 0; l < neuronDerivs.Length; l++)
         {
-            neuronDerivs[layerSizes.Length-1][j] = 2 * (neurons[layerSizes.Length-1][j] - goals[j]);
+            System.Array.Clear(neuronDerivs[l], 0, neuronDerivs[l].Length);
+        }
+
+
+        //set last layer neuron derivatives
+        for (int j = 0; j < layerSizes[lastLayer]; j++)
+        {
+            neuronDerivs[lastLayer][j] = 2 * (neurons[lastLayer][j] - goals[j]);
         }
 
         //set all the neuron derivatives starting from 2nd to last and going back
-        for (int l = layerSizes.Length - 3; l >= 0; l--)
+        for (int l = lastLayer - 2; l >= 0; l--)
         {
             for (int j = 0; j < layerSizes[l]; j++)
             {
@@ -207,7 +240,12 @@ public class backpropNN : MonoBehaviour
             return Mathf.Pow(2.7182818284f, -x) / Mathf.Pow(1 + Mathf.Pow(2.7182818284f, -x), 2);
         } else
         {
-            return (x > 0) ? 1 : 1;
+            return (x > 0) ? 1 : 0;
         }
+    }
+
+    public float[] getOutput()
+    {
+        return neurons[layerSizes.Length-1];
     }
 }

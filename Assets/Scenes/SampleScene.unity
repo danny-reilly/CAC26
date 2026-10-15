@@ -373,9 +373,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7905b8a2ad8756419acaec5c11ad496, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::backpropNN
-  goals:
-  - 0.67
-  - 0.2
 --- !u!4 &1055147188
 Transform:
   m_ObjectHideFlags: 0
