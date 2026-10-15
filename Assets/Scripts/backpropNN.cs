@@ -5,7 +5,7 @@ public class backpropNN : MonoBehaviour
     static float[] inputs = { 0.3f, -0.8f, 0.4f, 1f, 0.02f, 0.52f };
     static int[] hiddenLayers = {20, 25, 20, 15};
     static float[] goals = {0.4f, 0.2f, 0.3f, 0.4f};
-    static float learnRate = 0.4f;
+    static float learnRate = 0.2f;
 
     nn nn = new nn(inputs, hiddenLayers, goals, learnRate);
 
@@ -18,7 +18,7 @@ public class backpropNN : MonoBehaviour
         {
 
             nn.runNeuralNetwork();
-            print("Gen: " + a + " - " + nn.getOutput()[0]);
+            print("Gen " + a + ": " + nn.getOutput()[0]);
             nn.backprop();
         }
 
@@ -188,7 +188,7 @@ public class nn
         }
 
         //set all the neuron derivatives starting from 2nd to last and going back
-        for (int l = lastLayer - 2; l >= 0; l--)
+        for (int l = lastLayer - 1; l >= 1; l--)
         {
             for (int j = 0; j < layerSizes[l]; j++)
             {
@@ -204,7 +204,7 @@ public class nn
 
 
         //set the values to change weights by
-        for (int l = 0; l < layerSizes.Length - 1; l++)
+        for (int l = 0; l < lastLayer; l++)
         {
             for (int j = 0; j < layerSizes[l]; j++)
             {
@@ -220,7 +220,7 @@ public class nn
         }
 
         //set the values to change biases by
-        for (int l = 0; l < layerSizes.Length - 1; l++)
+        for (int l = 0; l < lastLayer; l++)
         {
             for (int j = 0; j < layerSizes[l+1]; j++)
             {
