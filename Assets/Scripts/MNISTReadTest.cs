@@ -18,7 +18,7 @@ public class MNISTReadTest : MonoBehaviour
         string[] rows = baseData.text.Split("\n"); // list with each index being a 785 long string with comma separators, first row is headings
     }
 
-    public void GetLabelAndVals(int *labelPtr, int[] *valsPtr, int index) // pointer allows you to reference the var you pass in
+    public void GetLabelAndVals(ref int labelPtr, ref int[] valsPtr, int index) // pointer allows you to reference the var you pass in
     {
         string[] currentRow = rows[index+1].Split(","); // +1 accounts for heading row
 
@@ -31,7 +31,7 @@ public class MNISTReadTest : MonoBehaviour
             int.TryParse(currentRow[i+1], out localVals[i]);
         }
 
-        *labelPtr = localLabel;
-        *valsPtr = localVals;
+        labelPtr = localLabel;
+        valsPtr = localVals;
     }
 }
