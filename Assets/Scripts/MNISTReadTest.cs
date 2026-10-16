@@ -12,10 +12,11 @@ public class MNISTReadTest : MonoBehaviour
     public TextAsset baseData;
     public int label;
     public int[] vals;
+    string[] rows;
 
     void Start()
     {
-        string[] rows = baseData.text.Split("\n"); // list with each index being a 785 long string with comma separators, first row is headings
+        rows = baseData.text.Split("\n"); // list with each index being a 785 long string with comma separators, first row is headings
     }
 
     public void GetLabelAndVals(ref int labelPtr, ref int[] valsPtr, int index) // pointer allows you to reference the var you pass in

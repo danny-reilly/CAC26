@@ -1,10 +1,10 @@
 using UnityEngine;
 
-public class backpropNN : MonoBehaviour
+public class neuralNetwork : MonoBehaviour
 {
     static float[] inputs = { 0.3f, -0.8f, 0.4f, 1f, 0.02f, 0.52f };
-    static int[] hiddenLayers = {20, 25, 20, 15};
-    static float[] goals = {0.4f, 0.2f, 0.3f, 0.4f};
+    static int[] hiddenLayers = { 20, 25, 20, 15 };
+    static float[] goals = { 0.4f, 0.2f, 0.3f, 0.4f };
     static float learnRate = 0.2f;
 
     NN nn = new NN(inputs, hiddenLayers, goals, learnRate);
@@ -42,14 +42,14 @@ public class NN
 
     float[] goals;
 
-    
+
     //how fast gradient decent happens (if it's too high or low, it will go towards infinity or not move and never reach the expected value)
     float learnRate;
 
     //neurons[x][y], x = layer num, y = which neuron in layer
     //weights[x][y][z], x = layer num, y = which neuron in layer, z = what neuron in the next layer its connected to
 
-    public nn(float[] inputs, int[] hiddenLayers, float[] goals, float learnRate)
+    public NN(float[] inputs, int[] hiddenLayers, float[] goals, float learnRate)
     {
         this.inputs = inputs;
         this.goals = goals;
@@ -57,11 +57,11 @@ public class NN
 
         layerSizes = new int[hiddenLayers.Length + 2];
         layerSizes[0] = inputs.Length;
-        for(int i = 1; i < hiddenLayers.Length+1; i++)
+        for (int i = 1; i < hiddenLayers.Length + 1; i++)
         {
-            layerSizes[i] = hiddenLayers[i-1]; 
+            layerSizes[i] = hiddenLayers[i - 1];
         }
-        layerSizes[hiddenLayers.Length+1] = goals.Length;
+        layerSizes[hiddenLayers.Length + 1] = goals.Length;
     }
 
     public void initialize()
@@ -79,7 +79,7 @@ public class NN
             neuronDerivs[layerNum] = new float[layerSizes[layerNum]];
         }
 
-        for(int i = 0; i < neurons[0].Length; i++)
+        for (int i = 0; i < neurons[0].Length; i++)
         {
             neurons[0][i] = inputs[i];
         }
@@ -114,7 +114,7 @@ public class NN
 
         //initialize biases
         biases = new float[layerSizes.Length - 1][];
-        for (int layerNum = 0; layerNum < layerSizes.Length-1; layerNum++)
+        for (int layerNum = 0; layerNum < layerSizes.Length - 1; layerNum++)
         {
             //intitialize each layer with y neurons
             biases[layerNum] = new float[layerSizes[layerNum + 1]];
@@ -195,8 +195,8 @@ public class NN
                 for (int m = 0; m < layerSizes[l + 1]; m++)
                 {
                     //print($"l: {l}, j {j}, {m} {weights[l+1][0][0]}");
-                    neuronDerivs[l][j] += (activationDerivative(neuronsPreActivation[l + 1][m], ((l == layerSizes.Length - 2)))) 
-                                            * (weights[l][j][m]) 
+                    neuronDerivs[l][j] += (activationDerivative(neuronsPreActivation[l + 1][m], ((l == layerSizes.Length - 2))))
+                                            * (weights[l][j][m])
                                             * (neuronDerivs[l + 1][m]); ////////// weights[l+1][j][m]?
                 }
             }
@@ -211,10 +211,10 @@ public class NN
                 for (int k = 0; k < layerSizes[l + 1]; k++)
                 {
                     //print($"l: {l}, j: {j}, k: {k} ---- {weights[l].Length}");
-                    weights[l][j][k] -= learnRate 
-                                        * neurons[l][j] 
-                                        * activationDerivative(neuronsPreActivation[l+1][k], (l == layerSizes.Length - 2)) 
-                                        * neuronDerivs[l+1][k];
+                    weights[l][j][k] -= learnRate
+                                        * neurons[l][j]
+                                        * activationDerivative(neuronsPreActivation[l + 1][k], (l == layerSizes.Length - 2))
+                                        * neuronDerivs[l + 1][k];
                 }
             }
         }
@@ -222,7 +222,7 @@ public class NN
         //set the values to change biases by
         for (int l = 0; l < lastLayer; l++)
         {
-            for (int j = 0; j < layerSizes[l+1]; j++)
+            for (int j = 0; j < layerSizes[l + 1]; j++)
             {
                 biases[l][j] -= learnRate
                                 * activationDerivative(neuronsPreActivation[l + 1][j], (l == layerSizes.Length - 2))
@@ -235,11 +235,12 @@ public class NN
 
     public float activationDerivative(float x, bool sigmoid)
     {
-        if(sigmoid)
+        if (sigmoid)
         {
             float s = Mathf.Exp(-x);
             return s / Mathf.Pow(1 + s, 2);
-        } else
+        }
+        else
         {
             return (x > 0) ? 1 : 0;
         }
@@ -247,6 +248,6 @@ public class NN
 
     public float[] getOutput()
     {
-        return neurons[layerSizes.Length-1];
+        return neurons[layerSizes.Length - 1];
     }
 }

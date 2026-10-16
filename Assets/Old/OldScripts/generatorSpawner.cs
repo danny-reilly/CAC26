@@ -35,11 +35,11 @@ public class generatorSpawner : MonoBehaviour
             float score = 0;
             foreach(Transform gen in transform)
             {
-                gen.GetComponent<neuralNetwork>().runNeuralNetwork();
+                gen.GetComponent<neuralNetworkOld>().runNeuralNetwork();
                 //print(gen.GetComponent<neuralNetwork>().score);
-                if(gen.GetComponent<neuralNetwork>().score > score)
+                if(gen.GetComponent<neuralNetworkOld>().score > score)
                 {
-                    score = gen.GetComponent<neuralNetwork>().score;
+                    score = gen.GetComponent<neuralNetworkOld>().score;
                 }
             }
 
@@ -48,14 +48,14 @@ public class generatorSpawner : MonoBehaviour
             foreach (Transform gen in transform)
             {
                 gen.name = "old";
-                if (gen.GetComponent<neuralNetwork>().score == score)
+                if (gen.GetComponent<neuralNetworkOld>().score == score)
                 {
                     imageGenerator = gen.gameObject;
                 }
             }
 
             genNum++;
-            GameObject.Find("UIDocument").GetComponent<UIDocument>().rootVisualElement.Q<Label>("genTxt").text = "Generation " + genNum + ": " + Mathf.Round(100*imageGenerator.GetComponent<neuralNetwork>().score/1875f) + "% Match";
+            GameObject.Find("UIDocument").GetComponent<UIDocument>().rootVisualElement.Q<Label>("genTxt").text = "Generation " + genNum + ": " + Mathf.Round(100*imageGenerator.GetComponent<neuralNetworkOld>().score/1875f) + "% Match";
             if(genNum % 100 == 0)
             {
                 print("100 gens in " + timer/10 + "s");
@@ -83,15 +83,15 @@ public class generatorSpawner : MonoBehaviour
         for (int i = 0; i < 4; i++)
         {
             GameObject newGen = Instantiate(best);
-            neuralNetwork nn = newGen.GetComponent<neuralNetwork>();
+            neuralNetworkOld nn = newGen.GetComponent<neuralNetworkOld>();
             if(start)
             {
                 nn.initialize();
             } else
             {
-                nn.weights = best.GetComponent<neuralNetwork>().cloneWeights();
-                nn.neurons = best.GetComponent<neuralNetwork>().cloneNeurons();
-                nn.biases = best.GetComponent<neuralNetwork>().cloneBiases();
+                nn.weights = best.GetComponent<neuralNetworkOld>().cloneWeights();
+                nn.neurons = best.GetComponent<neuralNetworkOld>().cloneNeurons();
+                nn.biases = best.GetComponent<neuralNetworkOld>().cloneBiases();
             }
 
             
@@ -104,9 +104,9 @@ public class generatorSpawner : MonoBehaviour
                 //keep unmutated version of parent in next gen
                 if(i != 0)
                 {
-                    newGen.GetComponent<neuralNetwork>().mutateWeights(mutateChance);
+                    newGen.GetComponent<neuralNetworkOld>().mutateWeights(mutateChance);
                 }
-                newGen.GetComponent<neuralNetwork>().runNeuralNetwork();
+                newGen.GetComponent<neuralNetworkOld>().runNeuralNetwork();
             }
             
         }
