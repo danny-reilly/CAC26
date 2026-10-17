@@ -1,18 +1,19 @@
 using UnityEngine;
+using System.IO;
 
 public class neuralNetwork : MonoBehaviour
 {
     static float[] inputs = { 0.3f, -0.8f, 0.4f, 1f, 0.02f, 0.52f };
     static int[] hiddenLayers = { 20, 25, 20, 15 };
-    static float[] goals = { 0.593f, 0.2f, 0.3f, 0.4f };
+    static float[] goals = {0.67f};
     static float learnRate = 0.2f;
 
     NN nn = new NN(inputs, hiddenLayers, goals, learnRate);
 
     public void Start()
     {
-
-        nn.initialize();
+        // train nn
+        /*nn.trainingInitialization();
 
         for (int a = 0; a < 1000; a++)
         {
@@ -21,7 +22,14 @@ public class neuralNetwork : MonoBehaviour
             print("Gen " + a + ": " + nn.getOutput()[0]);
             nn.backprop();
         }
+        nn.saveNN();*/
 
+
+
+        //load nn
+        nn.loadInitialization();
+        nn.runNeuralNetwork();
+        print("output: " + nn.getOutput()[0]);
     }
 }
 
@@ -64,9 +72,9 @@ public class NN
         layerSizes[hiddenLayers.Length + 1] = goals.Length;
     }
 
-    public void initialize()
+    ////////////////////initialization for when weights and biases aren't trained yet
+    public void trainingInitialization()
     {
-        ///////////////////////////////////////////////////////////////// initialization /////////////////////////////////////////////////////////////////
         //initialize neurons and activations with x layers 
         neurons = new float[layerSizes.Length][];
         neuronsPreActivation = new float[layerSizes.Length][];
@@ -127,6 +135,130 @@ public class NN
             }
         }
     }
+    ///////////////// end trainInit
+
+
+
+
+
+
+
+    ///////////////////////initialization for when weights and biases are already trained
+    public void loadInitialization()
+    {
+
+        //////// get data from .dat files
+        string weightsPath = Application.dataPath + "/Resources/NNData/weights.dat";
+        string biasesPath = Application.dataPath + "/Resources/NNData/biases.dat";
+        string layersPath = Application.dataPath + "/Resources/NNData/layers.dat";
+
+        //set layers
+        using (BinaryReader reader = new BinaryReader(File.Open(layersPath, FileMode.Open)))
+        {
+            layerSizes = new int[reader.BaseStream.Length/4];
+            int pos = 0;
+            while (reader.BaseStream.Position < reader.BaseStream.Length)
+            {
+                int value = reader.ReadInt32(); // reads ints
+                //Debug.Log("Layer size = " + value + " at layer " + pos);
+                layerSizes[pos] = value;
+                pos++;
+            }
+        }
+
+        //initialize neurons and activations with x layers 
+        neurons = new float[layerSizes.Length][];
+        neuronsPreActivation = new float[layerSizes.Length][];
+        neuronDerivs = new float[layerSizes.Length][];
+        for (int layerNum = 0; layerNum < layerSizes.Length; layerNum++)
+        {
+            //initialize each layer with y neurons
+            neurons[layerNum] = new float[layerSizes[layerNum]];
+            neuronsPreActivation[layerNum] = new float[layerSizes[layerNum]];
+            neuronDerivs[layerNum] = new float[layerSizes[layerNum]];
+        }
+
+        for (int i = 0; i < neurons[0].Length; i++)
+        {
+            neurons[0][i] = inputs[i];
+        }
+
+
+
+        //set biases
+        biases = new float[layerSizes.Length - 1][];
+        for (int layerNum = 0; layerNum < layerSizes.Length - 1; layerNum++)
+        {
+            //intitialize each layer with y neurons
+            biases[layerNum] = new float[layerSizes[layerNum + 1]];
+        }
+
+            using (BinaryReader reader = new BinaryReader(File.Open(biasesPath, FileMode.Open)))
+        {
+            int i = 0;
+            int j = 0;
+            while (reader.BaseStream.Position < reader.BaseStream.Length)
+            {
+                float value = reader.ReadSingle(); // reads ints
+                biases[i][j] = value;
+                j++;
+
+                if(j >= layerSizes[i+1])
+                {
+                    i++;
+                    j = 0;
+                }
+
+            }
+        }
+
+
+
+        //set weights
+        weights = new float[layerSizes.Length - 1][][];
+        for (int layerNum = 0; layerNum < layerSizes.Length - 1; layerNum++)
+        {
+            //intitialize each layer with y neurons
+            weights[layerNum] = new float[layerSizes[layerNum]][];
+
+            //initialize each neuron with z weights
+            //z = amount of neurons in next layer
+            for (int neuronNum = 0; neuronNum < layerSizes[layerNum]; neuronNum++)
+            {
+                weights[layerNum][neuronNum] = new float[layerSizes[layerNum + 1]];
+            }
+        }
+
+        using (BinaryReader reader = new BinaryReader(File.Open(weightsPath, FileMode.Open)))
+        {
+            int i = 0;
+            int j = 0;
+            int k = 0;
+            while (reader.BaseStream.Position < reader.BaseStream.Length)
+            {
+                float value = reader.ReadSingle(); // reads ints
+                weights[i][j][k] = value;
+                k++;
+
+                if (k >= layerSizes[i + 1])
+                {
+                    j++;
+                    k = 0;
+
+                    if(j >= layerSizes[i])
+                    {
+                        i++;
+                        j = 0;
+                    }
+                }
+
+            }
+        }
+
+    }
+    ///////////////////// end loadInit
+
+
 
 
 
@@ -251,4 +383,57 @@ public class NN
         return neurons[layerSizes.Length - 1];
     }
 
+
+    public void saveNN()
+    {
+        //save weights,
+        //biases, layers, layer sizes
+
+        string weightsPath = Application.dataPath + "/Resources/NNData/weights.dat";
+        string biasesPath = Application.dataPath + "/Resources/NNData/biases.dat";
+        string layersPath = Application.dataPath + "/Resources/NNData/layers.dat";
+
+
+        //weights
+        using (BinaryWriter writer = new BinaryWriter(
+            File.Open(weightsPath, FileMode.Create)))
+        {
+            for (int x = 0; x < weights.Length; x++)
+            {
+                for (int y = 0; y < weights[x].Length; y++)
+                {
+                    for (int z = 0; z < weights[x][y].Length; z++)
+                    {
+                        writer.Write(weights[x][y][z]);
+                    }
+                }
+            }
+        }
+
+        //biases
+        using (BinaryWriter writer = new BinaryWriter(
+            File.Open(biasesPath, FileMode.Create)))
+        {
+            for (int x = 0; x < biases.Length; x++)
+            {
+                for (int y = 0; y < biases[x].Length; y++)
+                {
+                    writer.Write(biases[x][y]);
+                }
+            }
+        }
+
+        //layers
+        using (BinaryWriter writer = new BinaryWriter(
+            File.Open(layersPath, FileMode.Create)))
+        {
+            for (int x = 0; x < layerSizes.Length; x++)
+            {
+                writer.Write(layerSizes[x]);
+            }
+        }
+
+        Debug.Log("Saved to: " + Application.dataPath + "/Resources/NNData");
+
+    }
 }
