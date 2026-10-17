@@ -4,7 +4,7 @@ public class neuralNetwork : MonoBehaviour
 {
     static float[] inputs = { 0.3f, -0.8f, 0.4f, 1f, 0.02f, 0.52f };
     static int[] hiddenLayers = { 20, 25, 20, 15 };
-    static float[] goals = { 0.4f, 0.2f, 0.3f, 0.4f };
+    static float[] goals = { 0.593f, 0.2f, 0.3f, 0.4f };
     static float learnRate = 0.2f;
 
     NN nn = new NN(inputs, hiddenLayers, goals, learnRate);
@@ -14,7 +14,7 @@ public class neuralNetwork : MonoBehaviour
 
         nn.initialize();
 
-        for (int a = 0; a < 100; a++)
+        for (int a = 0; a < 1000; a++)
         {
 
             nn.runNeuralNetwork();
@@ -250,4 +250,5 @@ public class NN
     {
         return neurons[layerSizes.Length - 1];
     }
+
 }
