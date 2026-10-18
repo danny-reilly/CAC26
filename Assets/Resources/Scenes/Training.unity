@@ -279,6 +279,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c06d38e5ff7c9f748af750d55f51dc11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::imageGen
+  imgNum: 0
 --- !u!114 &786177986
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -291,8 +292,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b2007429ba3fd645a75d47597606bd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::training
-  hiddenLayers: c8000000c8000000c8000000c8000000
-  learnRate: 0.4
+  hiddenLayers: 28000000280000002800000028000000
+  train: 0
+  learnRate: 0.2
+  batchSize: 100
+  epochNum: 20
 --- !u!1 &1098671433
 GameObject:
   m_ObjectHideFlags: 0

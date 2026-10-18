@@ -1,39 +1,8 @@
 using UnityEngine;
 using System.IO;
+using System.Linq;
 
-public class neuralNetwork : MonoBehaviour
-{
-    static float[] inputs = { 0.3f, -0.8f, 0.4f, 1f, 0.02f, 0.52f };
-    static int[] hiddenLayers = { 20, 25, 20, 15 };
-    static float[] goals = {0.67f};
-    static float learnRate = 0.2f;
-
-    NN nn = new NN(inputs, hiddenLayers, goals, learnRate);
-
-    public void Start()
-    {
-        // train nn
-        /*nn.trainingInitialization();
-
-        for (int a = 0; a < 1000; a++)
-        {
-
-            nn.runNeuralNetwork();
-            print("Gen " + a + ": " + nn.getOutput()[0]);
-            nn.backprop();
-        }
-        nn.saveNN();*/
-
-
-
-        //load nn
-        nn.loadInitialization();
-        nn.runNeuralNetwork();
-        print("output: " + nn.getOutput()[0]);
-    }
-}
-
-public class NN
+public class neuralNetwork
 {
     //how many neurons in each layer
     int[] layerSizes;
@@ -45,19 +14,29 @@ public class NN
     //values of biases
     float[][] biases;
 
+    //neuron values before sigmoid/ReLU
     float[][] neuronsPreActivation;
+    //Derivatives for calculating weight/bias changes
     float[][] neuronDerivs;
 
+    //storage for weight/bias changes (added after each batch of images)
+    float[][][] weightChanges;
+    float[][] biasChanges;
+
+    //intended outputs
     float[] goals;
 
 
     //how fast gradient decent happens (if it's too high or low, it will go towards infinity or not move and never reach the expected value)
     float learnRate;
 
+    public int[] shuffledMNISTIndex;
+
+
     //neurons[x][y], x = layer num, y = which neuron in layer
     //weights[x][y][z], x = layer num, y = which neuron in layer, z = what neuron in the next layer its connected to
 
-    public NN(float[] inputs, int[] hiddenLayers, float[] goals, float learnRate)
+    public neuralNetwork(float[] inputs, int[] hiddenLayers, float[] goals, float learnRate)
     {
         this.inputs = inputs;
         this.goals = goals;
@@ -96,17 +75,19 @@ public class NN
 
         //initialize weights with x layers and set them randomly
         weights = new float[layerSizes.Length - 1][][];
+        weightChanges = new float[layerSizes.Length - 1][][];
         for (int layerNum = 0; layerNum < layerSizes.Length - 1; layerNum++)
         {
             //intitialize each layer with y neurons
             weights[layerNum] = new float[layerSizes[layerNum]][];
+            weightChanges[layerNum] = new float[layerSizes[layerNum]][];
 
             //initialize each neuron with z weights
             //z = amount of neurons in next layer
             for (int neuronNum = 0; neuronNum < layerSizes[layerNum]; neuronNum++)
             {
                 weights[layerNum][neuronNum] = new float[layerSizes[layerNum + 1]];
-
+                weightChanges[layerNum][neuronNum] = new float[layerSizes[layerNum + 1]];
 
 
                 //set weights to random value
@@ -122,10 +103,12 @@ public class NN
 
         //initialize biases
         biases = new float[layerSizes.Length - 1][];
+        biasChanges = new float[layerSizes.Length - 1][];
         for (int layerNum = 0; layerNum < layerSizes.Length - 1; layerNum++)
         {
             //intitialize each layer with y neurons
             biases[layerNum] = new float[layerSizes[layerNum + 1]];
+            biasChanges[layerNum] = new float[layerSizes[layerNum + 1]];
 
             //initialize each neuron with z weights
             //z = amount of neurons in next layer
@@ -343,7 +326,7 @@ public class NN
                 for (int k = 0; k < layerSizes[l + 1]; k++)
                 {
                     //print($"l: {l}, j: {j}, k: {k} ---- {weights[l].Length}");
-                    weights[l][j][k] -= learnRate
+                    weightChanges[l][j][k] -= learnRate
                                         * neurons[l][j]
                                         * activationDerivative(neuronsPreActivation[l + 1][k], (l == layerSizes.Length - 2))
                                         * neuronDerivs[l + 1][k];
@@ -356,7 +339,7 @@ public class NN
         {
             for (int j = 0; j < layerSizes[l + 1]; j++)
             {
-                biases[l][j] -= learnRate
+                biasChanges[l][j] -= learnRate
                                 * activationDerivative(neuronsPreActivation[l + 1][j], (l == layerSizes.Length - 2))
                                 * neuronDerivs[l + 1][j];
             }
@@ -365,7 +348,37 @@ public class NN
 
     }
 
-    public float activationDerivative(float x, bool sigmoid)
+
+
+    public void applyBackprop(int batchSize)
+    {
+        //change weights
+        for (int l = 0; l < layerSizes.Length - 1; l++)
+        {
+            for (int j = 0; j < layerSizes[l]; j++)
+            {
+                for (int k = 0; k < layerSizes[l + 1]; k++)
+                {
+                    //print($"l: {l}, j: {j}, k: {k} ---- {weights[l].Length}");
+                    weights[l][j][k] += weightChanges[l][j][k] / batchSize;
+                    weightChanges[l][j][k] = 0;
+                }
+            }
+        }
+
+        //change biases
+        for (int l = 0; l < layerSizes.Length - 1; l++)
+        {
+            for (int j = 0; j < layerSizes[l + 1]; j++)
+            {
+                biases[l][j] += biasChanges[l][j]/batchSize;
+                biasChanges[l][j] = 0;
+            }
+        }
+    }
+
+
+    float activationDerivative(float x, bool sigmoid)
     {
         if (sigmoid)
         {
@@ -435,5 +448,41 @@ public class NN
 
         Debug.Log("Saved to: " + Application.dataPath + "/Resources/NNData");
 
+    }
+
+
+    public void shuffle()
+    {
+        if(shuffledMNISTIndex == null)
+        {
+            //creates an array [0, 1... 59999]
+            shuffledMNISTIndex = Enumerable.Range(0, 60000).ToArray();
+        }
+  
+        for(int i = 0; i < 60000; i++)
+        {
+            //switches each 
+            int j = Random.Range(0, 60000);
+            int temp = shuffledMNISTIndex[i];
+            shuffledMNISTIndex[i] = shuffledMNISTIndex[j];
+            shuffledMNISTIndex[j] = temp;
+        }
+    }
+
+    public void changeInputs(float[] newInputs)
+    {
+        for (int i = 0; i < neurons[0].Length; i++)
+        {
+           inputs[i] = newInputs[i];
+           neurons[0][i] = inputs[i];
+        }
+    }
+
+    public void changeGoals(float[] newGoals)
+    {
+        for (int i = 0; i < goals.Length; i++)
+        {
+            goals[i] = newGoals[i];
+        }
     }
 }
