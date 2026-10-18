@@ -155,7 +155,7 @@ public class NN
         //set layers
         using (BinaryReader reader = new BinaryReader(File.Open(layersPath, FileMode.Open)))
         {
-            layerSizes = new int[reader.BaseStream.Length/4];
+            layerSizes = new int[reader.BaseStream.Length / 4];
             int pos = 0;
             while (reader.BaseStream.Position < reader.BaseStream.Length)
             {
@@ -193,7 +193,7 @@ public class NN
             biases[layerNum] = new float[layerSizes[layerNum + 1]];
         }
 
-            using (BinaryReader reader = new BinaryReader(File.Open(biasesPath, FileMode.Open)))
+        using (BinaryReader reader = new BinaryReader(File.Open(biasesPath, FileMode.Open)))
         {
             int i = 0;
             int j = 0;
@@ -203,7 +203,7 @@ public class NN
                 biases[i][j] = value;
                 j++;
 
-                if(j >= layerSizes[i+1])
+                if (j >= layerSizes[i + 1])
                 {
                     i++;
                     j = 0;
@@ -245,7 +245,7 @@ public class NN
                     j++;
                     k = 0;
 
-                    if(j >= layerSizes[i])
+                    if (j >= layerSizes[i])
                     {
                         i++;
                         j = 0;

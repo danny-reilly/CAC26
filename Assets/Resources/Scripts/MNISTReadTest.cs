@@ -18,13 +18,10 @@ public class MNISTReadTest : MonoBehaviour
     {
         baseData = Resources.Load<TextAsset>("MNIST/mnist_train");
         rows = baseData.text.Split("\n"); // list with each index being a 785 long string with comma separators, first row is headings
-        print("a"); 
     }
 
     public void GetLabelAndVals(ref int labelPtr, ref int[] valsPtr, int index) // pointer allows you to reference the var you pass in
     {
-        print("b");
-        print(rows[1]);
         string[] currentRow = rows[index+1].Split(","); // +1 accounts for heading row
 
         int localLabel;
