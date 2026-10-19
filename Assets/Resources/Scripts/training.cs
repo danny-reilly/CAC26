@@ -22,6 +22,7 @@ public class training : MonoBehaviour
 
     neuralNetwork nn;
     MNISTReadTest mrt;
+    DrawDigits dd;
 
     VisualElement uiRoot; 
     public void Start()
@@ -40,6 +41,7 @@ public class training : MonoBehaviour
         goals = goals09(imgLabel);
         inputs = intsToFloats(inputsInt);
 
+
         nn = new neuralNetwork(inputs, hiddenLayers, goals, learnRate);
 
         if(train)
@@ -50,6 +52,7 @@ public class training : MonoBehaviour
         } else
         {
             /////// load nn
+            dd = GameObject.Find("Canvas").GetComponent<DrawDigits>();
             nn.loadInitialization();
             nn.runNeuralNetwork();
             updateText();
@@ -89,10 +92,15 @@ public class training : MonoBehaviour
 
     void Update()
     {
-        /*nn.runNeuralNetwork();
+        if(!train)
+        {
+            nn.changeInputs(intsToFloats(dd.convertArray));
+            nn.runNeuralNetwork();
+            updateText();   
+        }
         //print("Gen " + a + ": " + nn.getOutput()[0]);
-        nn.backprop();
-        nn.applyBackprop(1);
+       // nn.backprop();
+        //nn.applyBackprop(1);
         //nn.saveNN();*/
     }
 

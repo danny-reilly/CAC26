@@ -16,6 +16,7 @@ public class DrawDigits : MonoBehaviour
     public int numRowsCols;
     public int drawRadius;
     public int[,] grid;
+    public int[] convertArray;
 
     int lastPixelX, lastPixelY;
     imgGenerator imgGen = new imgGenerator();
@@ -53,10 +54,13 @@ public class DrawDigits : MonoBehaviour
 
         // worldspace coords centered on the image
         Vector2 mouseToCanvasRelative = new Vector2((mousePosition.x - digitCanvasPos.x) /0.00925925925f, (mousePosition.y - digitCanvasPos.y) /0.00925925925f);
-        int pixelCoordX = (int) ((numRowsCols * (mouseToCanvasRelative.x/digitCanvas.GetComponent<Image>().rectTransform.rect.width) / digitCanvas.GetComponent<Image>().rectTransform.localScale.x) + (numRowsCols/2));
-        int pixelCoordY = (int) ((numRowsCols * (mouseToCanvasRelative.y/digitCanvas.GetComponent<Image>().rectTransform.rect.height) / digitCanvas.GetComponent<Image>().rectTransform.localScale.y) + (numRowsCols/2));
+        float pixelX = ((numRowsCols * (mouseToCanvasRelative.x/digitCanvas.GetComponent<Image>().rectTransform.rect.width) / digitCanvas.GetComponent<Image>().rectTransform.localScale.x) + (numRowsCols/2));
+        float pixelY =  ((numRowsCols * (mouseToCanvasRelative.y/digitCanvas.GetComponent<Image>().rectTransform.rect.height) / digitCanvas.GetComponent<Image>().rectTransform.localScale.y) + (numRowsCols/2));
+        int pixelCoordX = (int)pixelX;
+        int pixelCoordY = (int)pixelY;
+
         //Vector2 pixelCoords = new Vector2(pixelCoordX, pixelCoordY);
-        print($"x: {pixelCoordX}, y: {pixelCoordY}");
+        //print($"x: {pixelCoordX}, y: {pixelCoordY}");
         if(mouseDown/* && (lastPixelX != pixelCoordX || lastPixelY != pixelCoordY)*/)
         {
             for(int i=-drawRadius; i<drawRadius; i++)
@@ -67,14 +71,19 @@ public class DrawDigits : MonoBehaviour
                     {
                         if(pixelCoordX + i > 0 && pixelCoordX + i <= numRowsCols && pixelCoordY + j > 0 && pixelCoordY + j <= numRowsCols) // checks bounds to stop overflow
                         {
-                            grid[pixelCoordY + j-1, pixelCoordX + i-1] = 255 /*- (int)Mathf.Sqrt(Mathf.Pow(i, 2f) + Mathf.Pow(j, 2f))*/;   
+                            int distance = (int) (40*Mathf.Abs(pixelX - Mathf.Abs(pixelCoordX - i+2))) + (int) (40*Mathf.Abs(pixelY - Mathf.Abs(pixelCoordY - j+1)));
+
+                            if(grid[pixelCoordY + j-1, pixelCoordX + i-1] < 255 - distance)
+                            {
+                                grid[pixelCoordY + j-1, pixelCoordX + i-1] = 255 - distance;   
+                            }
                         }
                     }
                 }
             }
         }
 
-        int[] convertArray = grid.Cast<int>().ToArray();
+        convertArray = grid.Cast<int>().ToArray();
 
         texture = imgGen.createImg(28, convertArray);
         Rect rect = new Rect(0, 0, digitCanvas.GetComponent<Image>().rectTransform.rect.width,digitCanvas.GetComponent<Image>().rectTransform.rect.height);

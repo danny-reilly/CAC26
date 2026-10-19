@@ -293,10 +293,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::training
   hiddenLayers: 28000000280000002800000028000000
-  train: 0
+  train: 1
   learnRate: 0.2
   batchSize: 100
-  epochNum: 20
+  epochNum: 1
 --- !u!1 &1098671433
 GameObject:
   m_ObjectHideFlags: 0
