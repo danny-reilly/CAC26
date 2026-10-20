@@ -25,7 +25,6 @@ public class imageGen : MonoBehaviour
     {
         texture = imgGen.createImg(28, testPixels);
         GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f), 28 / 10f);
-        print(label);
     }
 
 }

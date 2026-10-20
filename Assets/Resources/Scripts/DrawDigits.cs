@@ -23,6 +23,7 @@ public class DrawDigits : MonoBehaviour
 
     void Awake()
     {
+        Debug.Log("oqef");
         int[,] tempGrid = new int[numRowsCols, numRowsCols];
         grid = tempGrid;
         for(int i=0; i<numRowsCols; i++)
@@ -45,7 +46,8 @@ public class DrawDigits : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Vector2 mouseScreenPos = Mouse.current.position.ReadValue();
+        Debug.Log(Mouse.current);
+        Vector2 mouseScreenPos = Mouse.current?.position.ReadValue() ?? Vector2.zero;
         Vector3 screenPos3D = new Vector3(mouseScreenPos.x, mouseScreenPos.y, 10f);
         Vector3 worldPosition = Camera.main.ScreenToWorldPoint(screenPos3D);
 
@@ -59,9 +61,10 @@ public class DrawDigits : MonoBehaviour
         int pixelCoordX = (int)pixelX;
         int pixelCoordY = (int)pixelY;
 
+
         //Vector2 pixelCoords = new Vector2(pixelCoordX, pixelCoordY);
         //print($"x: {pixelCoordX}, y: {pixelCoordY}");
-        if(mouseDown/* && (lastPixelX != pixelCoordX || lastPixelY != pixelCoordY)*/)
+        if (mouseDown/* && (lastPixelX != pixelCoordX || lastPixelY != pixelCoordY)*/)
         {
             for(int i=-drawRadius; i<drawRadius; i++)
             {
