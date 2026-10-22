@@ -46,7 +46,6 @@ public class DrawDigits : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(Mouse.current);
         Vector2 mouseScreenPos = Mouse.current?.position.ReadValue() ?? Vector2.zero;
         Vector3 screenPos3D = new Vector3(mouseScreenPos.x, mouseScreenPos.y, 10f);
         Vector3 worldPosition = Camera.main.ScreenToWorldPoint(screenPos3D);

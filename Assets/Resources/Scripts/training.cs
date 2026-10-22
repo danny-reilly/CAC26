@@ -1,9 +1,10 @@
-using UnityEngine;
-using System.IO;
-using UnityEngine.UIElements;
-using System.Linq;
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.AdaptivePerformance.Provider;
+using UnityEngine.UIElements;
 
 
 public class training : MonoBehaviour
@@ -23,19 +24,20 @@ public class training : MonoBehaviour
     neuralNetwork nn;
     MNISTReadTest mrt;
     DrawDigits dd;
+    imgGenerator ig;
 
-    VisualElement uiRoot; 
+    VisualElement uiRoot;
     public void Start()
     {
 
         uiRoot = GameObject.Find("UIDocument").GetComponent<UIDocument>().rootVisualElement;
 
-        /////// train nn
-        
+        ig = new imgGenerator();        
+
         //get an image from mnist and take data from the image
         mrt = new MNISTReadTest();
         mrt.Init();
-        mrt.GetLabelAndVals(ref imgLabel, ref inputsInt, 0);
+        mrt.GetLabelAndVals(ref imgLabel, ref inputsInt, 0);//GetComponent<imageGen>().imgNum);
 
         //set goals and inputs
         goals = goals09(imgLabel);
@@ -44,7 +46,7 @@ public class training : MonoBehaviour
 
         nn = new neuralNetwork(inputs, hiddenLayers, goals, learnRate);
 
-        if(train)
+        if (train)
         {
             //train
             nn.trainingInitialization();
@@ -52,11 +54,21 @@ public class training : MonoBehaviour
         } else
         {
             /////// load nn
-            dd = GameObject.Find("Canvas").GetComponent<DrawDigits>();
+            if (GameObject.Find("Canvas") != null)
+            {
+                dd = GameObject.Find("Canvas").GetComponent<DrawDigits>();
+            }
             nn.loadInitialization();
             nn.runNeuralNetwork();
             updateText();
         }
+
+        //for testing accuracy
+        /*
+        nn.loadInitialization();
+        nn.runNeuralNetwork();
+        StartCoroutine(testNetwork());
+        */
     }
 
 
@@ -79,12 +91,14 @@ public class training : MonoBehaviour
                     nn.backprop();
                 }
                 nn.applyBackprop(batchSize);
-                Debug.Log("batch " + i + "/" + 60000 / batchSize + " complete (" + (epoch+1) + "/" + epochNum + ")");
+                //Debug.Log("batch " + i + "/" + 60000 / batchSize + " complete (" + (epoch + 1) + "/" + epochNum + ")");
                 yield return null;
             }
+
+            nn.saveNN(epoch);
+            StartCoroutine(testNetwork(epoch));
         }
 
-        nn.saveNN();
     }
 
 
@@ -92,16 +106,15 @@ public class training : MonoBehaviour
 
     void Update()
     {
-        if(!train)
+        if (!train)
         {
-            nn.changeInputs(intsToFloats(dd.convertArray));
+            if (dd != null)
+            {
+                nn.changeInputs(intsToFloats(dd.convertArray));
+            }
             nn.runNeuralNetwork();
-            updateText();   
+            updateText();
         }
-        //print("Gen " + a + ": " + nn.getOutput()[0]);
-       // nn.backprop();
-        //nn.applyBackprop(1);
-        //nn.saveNN();*/
     }
 
     float[] goals09(int num)
@@ -118,9 +131,9 @@ public class training : MonoBehaviour
     float[] intsToFloats(int[] list)
     {
         float[] newList = new float[list.Length];
-        for(int i = 0; i < list.Length; i++)
+        for (int i = 0; i < list.Length; i++)
         {
-            newList[i] = list[i]/255f;
+            newList[i] = list[i] / 255f;
         }
         return newList;
     }
@@ -136,5 +149,47 @@ public class training : MonoBehaviour
             uiRoot.Q<Label>(i + "").text =
             topChars[i] + ": " + Mathf.Round(10000 * nn.getOutput()[topChars[i]]) / 100 + "%";
         }
+    }
+
+
+
+
+    IEnumerator testNetwork(int epoch) {
+        int correctNum = 0;
+        for (int i = 0; i < 10000; i++)
+        {
+            mrt.GetLabelAndVals(ref imgLabel, ref inputsInt, i);
+            //imgLabel;
+            nn.changeInputs(intsToFloats(inputsInt));
+            nn.runNeuralNetwork();
+            //Texture2D texture = ig.createImg(28, inputsInt);
+            //GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f), 28 / 10f);
+            //updateText();
+
+            float[] outputs = nn.getOutput();
+            int best = 0;
+            float bestValue = 0;
+            for(int j = 0; j < 10; j++)
+            {
+                if (outputs[j] > bestValue)
+                {
+                    bestValue = outputs[j];
+                    best = j;
+                }
+            }
+
+            //if guess was correct
+            if(best == imgLabel)
+            {
+                //Debug.Log("correct (" + i + "/10000)");
+                correctNum++;
+            } else
+            {
+                //Debug.Log("incorrect (" + i + "/10000), (correct = " + imgLabel + ")");
+            }
+
+        }
+        Debug.Log(correctNum + "/10000 correct for #" + epoch);
+        yield return null;
     }
 }

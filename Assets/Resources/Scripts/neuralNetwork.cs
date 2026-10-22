@@ -132,9 +132,9 @@ public class neuralNetwork
     {
 
         //////// get data from .dat files
-        string weightsPath = Application.dataPath + "/Resources/NNData/weights.dat";
-        string biasesPath = Application.dataPath + "/Resources/NNData/biases.dat";
-        string layersPath = Application.dataPath + "/Resources/NNData/layers.dat";
+        string weightsPath = Application.dataPath + "/Resources/NNData/weights60.dat";
+        string biasesPath = Application.dataPath + "/Resources/NNData/biases60.dat";
+        string layersPath = Application.dataPath + "/Resources/NNData/layers60.dat";
 
         //set layers
         using (BinaryReader reader = new BinaryReader(File.Open(layersPath, FileMode.Open)))
@@ -398,14 +398,14 @@ public class neuralNetwork
     }
 
 
-    public void saveNN()
+    public void saveNN(int id)
     {
         //save weights,
         //biases, layers, layer sizes
 
-        string weightsPath = Application.dataPath + "/Resources/NNData/weights.dat";
-        string biasesPath = Application.dataPath + "/Resources/NNData/biases.dat";
-        string layersPath = Application.dataPath + "/Resources/NNData/layers.dat";
+        string weightsPath = Application.dataPath + "/Resources/NNData/weights" + id + ".dat";
+        string biasesPath = Application.dataPath + "/Resources/NNData/biases" + id + ".dat";
+        string layersPath = Application.dataPath + "/Resources/NNData/layers" + id + ".dat";
 
 
         //weights
