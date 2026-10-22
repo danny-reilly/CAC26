@@ -73,11 +73,11 @@ public class DrawDigits : MonoBehaviour
                     {
                         if(pixelCoordX + i > 0 && pixelCoordX + i <= numRowsCols && pixelCoordY + j > 0 && pixelCoordY + j <= numRowsCols) // checks bounds to stop overflow
                         {
-                            int distance = (int) (40*Mathf.Abs(pixelX - Mathf.Abs(pixelCoordX - i+2))) + (int) (40*Mathf.Abs(pixelY - Mathf.Abs(pixelCoordY - j+1)));
+                            int distance = (int) (150*Mathf.Abs(pixelX - Mathf.Abs(pixelCoordX - i+2))) + (int) (150*Mathf.Abs(pixelY - Mathf.Abs(pixelCoordY - j+1)));
 
-                            if(grid[pixelCoordY + j-1, pixelCoordX + i-1] < 255 - distance)
+                            if(grid[pixelCoordY + j-1, pixelCoordX + i-1] < 255)// - distance)
                             {
-                                grid[pixelCoordY + j-1, pixelCoordX + i-1] = 255 - distance;   
+                                grid[pixelCoordY + j-1, pixelCoordX + i-1] = 255;// - distance;   
                             }
                         }
                     }
