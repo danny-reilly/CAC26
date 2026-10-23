@@ -260,13 +260,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 786177981}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
   m_LocalPosition: {x: -0.08865, y: -0.67924, z: 0}
-  m_LocalScale: {x: 1, y: -1, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
 --- !u!114 &786177985
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -274,12 +274,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 786177981}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c06d38e5ff7c9f748af750d55f51dc11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::imageGen
-  imgNum: 2
+  imgNum: 697931
 --- !u!114 &786177986
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -292,7 +292,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b2007429ba3fd645a75d47597606bd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::training
-  hiddenLayers: 28000000280000002800000028000000
+  hiddenLayers: 2800000028000000280000002800000028000000
+  charNum: 62
   train: 1
   learnRate: 0.01
   batchSize: 100

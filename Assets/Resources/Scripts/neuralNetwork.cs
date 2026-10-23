@@ -132,9 +132,9 @@ public class neuralNetwork
     {
 
         //////// get data from .dat files
-        string weightsPath = Application.dataPath + "/Resources/NNData/weights60.dat";
-        string biasesPath = Application.dataPath + "/Resources/NNData/biases60.dat";
-        string layersPath = Application.dataPath + "/Resources/NNData/layers60.dat";
+        string weightsPath = Application.dataPath + "/Resources/NNData/weights10.dat";
+        string biasesPath = Application.dataPath + "/Resources/NNData/biases10.dat";
+        string layersPath = Application.dataPath + "/Resources/NNData/layers10.dat";
 
         //set layers
         using (BinaryReader reader = new BinaryReader(File.Open(layersPath, FileMode.Open)))
@@ -452,18 +452,18 @@ public class neuralNetwork
     }
 
 
-    public void shuffle()
+    public void shuffle(int MNISTLength)
     {
         if(shuffledMNISTIndex == null)
         {
-            //creates an array [0, 1... 59999]
-            shuffledMNISTIndex = Enumerable.Range(0, 60000).ToArray();
+            //creates an array [0, 1... MNISTLength-1]
+            shuffledMNISTIndex = Enumerable.Range(0, MNISTLength).ToArray();
         }
   
-        for(int i = 0; i < 60000; i++)
+        for(int i = 0; i < MNISTLength; i++)
         {
             //switches each 
-            int j = Random.Range(0, 60000);
+            int j = Random.Range(0, MNISTLength);
             int temp = shuffledMNISTIndex[i];
             shuffledMNISTIndex[i] = shuffledMNISTIndex[j];
             shuffledMNISTIndex[j] = temp;
