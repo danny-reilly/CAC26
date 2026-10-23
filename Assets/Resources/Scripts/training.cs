@@ -110,7 +110,7 @@ public class training : MonoBehaviour
         {
             if (dd != null)
             {
-                nn.changeInputs(intsToFloats(dd.convertArray));
+                nn.changeInputs(intsToFloats(dd.centeredGridArray));
             }
             nn.runNeuralNetwork();
             updateText();

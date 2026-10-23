@@ -1,13 +1,19 @@
+using System;
+using System.Drawing;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-using System.Linq;
 
 public class DrawDigits : MonoBehaviour
 {
     public GameObject digitCanvas;
 
     private InputAction mouseClick;
+    private InputAction resetCanvas;
+
+    private Image drawingImage;
+    private Image centerImage;
 
     Texture2D texture;
 
@@ -17,30 +23,38 @@ public class DrawDigits : MonoBehaviour
     public int drawRadius;
     public int[,] grid;
     public int[] convertArray;
+    int[,] centeredGrid;
+    public int[] centeredGridArray;
 
     int lastPixelX, lastPixelY;
     imgGenerator imgGen = new imgGenerator();
 
     void Awake()
     {
-        Debug.Log("oqef");
+        drawingImage = digitCanvas.GetComponent<Image>();
+        centerImage = GameObject.Find("Image (1)").GetComponent<Image>();
+
+
         int[,] tempGrid = new int[numRowsCols, numRowsCols];
         grid = tempGrid;
-        for(int i=0; i<numRowsCols; i++)
+        for (int i = 0; i < numRowsCols; i++)
         {
-            for(int j=0; j<numRowsCols; j++)
+            for (int j = 0; j < numRowsCols; j++)
             {
-                grid[i,j] = 0;
+                grid[i, j] = 0;
             }
         }
 
         mouseClick = new InputAction(binding: "<Mouse>/leftButton");
+        resetCanvas = new InputAction(binding: "<Keyboard>/e");
         mouseClick.performed += ctx => mouseClicked();
         mouseClick.canceled += ctx => mouseUnclicked();
+        resetCanvas.performed += ctx => erase();
     }
 
     private void OnEnable() => mouseClick.Enable();
     private void OnDisable() => mouseClick.Disable();
+
 
 
     // Update is called once per frame
@@ -88,13 +102,22 @@ public class DrawDigits : MonoBehaviour
         convertArray = grid.Cast<int>().ToArray();
 
         texture = imgGen.createImg(28, convertArray);
-        Rect rect = new Rect(0, 0, digitCanvas.GetComponent<Image>().rectTransform.rect.width,digitCanvas.GetComponent<Image>().rectTransform.rect.height);
+        Rect rect = new Rect(0, 0, drawingImage.rectTransform.rect.width,drawingImage.rectTransform.rect.height);
         Vector2 pivot = new Vector2(0.5f, 0.5f);
-        digitCanvas.GetComponent<Image>().sprite = Sprite.Create(texture, rect, pivot, 1);
+        drawingImage.sprite = Sprite.Create(texture, rect, pivot, 1);
 
         // used to check if the grid pos changed since last frame
         lastPixelX = pixelCoordX;
         lastPixelY = pixelCoordY;
+
+
+        if (Keyboard.current.eKey.wasPressedThisFrame)
+        {
+            erase();
+        }
+
+
+        centerImg();
     }
 
     
@@ -108,4 +131,94 @@ public class DrawDigits : MonoBehaviour
     {
         mouseDown = false;
     }
+
+    void erase()
+    {
+        for (int i = 0; i < 28; i++) {
+            for (int j = 0; j < 28; j++)
+            {
+                grid[i, j] = 0;
+            }
+        }
+    }
+
+    void centerImg()
+    {
+        centeredGrid = new int[numRowsCols, numRowsCols];
+        for (int i = 0; i < numRowsCols; i++)
+        {
+            for (int j = 0; j < numRowsCols; j++)
+            {
+                centeredGrid[i, j] = 0;
+            }
+        }
+
+        int minX = numRowsCols, minY = numRowsCols, maxX = -1, maxY = -1;
+
+        for (int x = 0; x < numRowsCols; x++) {
+            for (int y = 0; y < numRowsCols; y++)
+            {
+                if (grid[x, y] != 0)
+                {
+                    minX = Mathf.Min(minX, x);
+                    minY = Mathf.Min(minY, y);
+                    maxX = Mathf.Max(maxX, x);
+                    maxY = Mathf.Max(maxY, y);
+                }
+            }
+        }
+
+        //if drawing not blank
+        if(maxX != -1)
+        {
+            int centerX = (minX + maxX) / 2;
+            int centerY = (minY + maxY) / 2;
+            int width = (maxX - minX)+1;
+            int height = (maxY - minY)+1;
+
+            int maxCharSize = 20;
+
+            float scale = Mathf.Min((float)maxCharSize/width, (float)maxCharSize/height);
+
+
+            int newWidth = Mathf.Max(
+            1, Mathf.RoundToInt(width * scale));
+
+            int newHeight = Mathf.Max(
+                1, Mathf.RoundToInt(height * scale));
+
+            // Position the resized character in the center.
+            int offsetX = (28 - newWidth) / 2;
+            int offsetY = (28 - newHeight) / 2;
+
+            // Resize using nearest-neighbor sampling.
+            for (int x = 0; x < newWidth; x++)
+            {
+                for (int y = 0; y < newHeight; y++)
+                {
+                    int sourceX = minX + Mathf.Min(
+                        width - 1,
+                        Mathf.FloorToInt((x + 0.5f) / scale));
+
+                    int sourceY = minY + Mathf.Min(
+                        height - 1,
+                        Mathf.FloorToInt((y + 0.5f) / scale));
+
+                    centeredGrid[offsetX + x, offsetY + y] =
+                        grid[sourceX, sourceY];
+                }
+            }
+
+        }
+
+
+        centeredGridArray = centeredGrid.Cast<int>().ToArray();
+        texture = imgGen.createImg(28, centeredGrid.Cast<int>().ToArray());
+        Rect rect = new Rect(0, 0, centerImage.rectTransform.rect.width, centerImage.rectTransform.rect.height);
+        Vector2 pivot = new Vector2(0.5f, 0.5f);
+        centerImage.sprite = Sprite.Create(texture, rect, pivot, 1);
+    }
+
+
+
 }
