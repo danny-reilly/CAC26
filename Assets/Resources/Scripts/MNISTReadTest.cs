@@ -9,15 +9,16 @@ public class MNISTReadTest : MonoBehaviour
     // MNIST (in CSV format) is basically 1 big table like a google sheet where the first collumn is the label (what number the image should be) and the last 784 are the 0-255 representing the brightness of the pixel.
     // In the last 784 collumns, the format iterates between the pixels like (1, 1) (1, 2) (1, 3) ........ (1, 28) (2, 1) (2, 2) all the way to (28, 28)
 
-    TextAsset baseData;
+    public TextAsset MNISTData;
+    public TextAsset extendedMNISTData;
     public int label;
     public int[] vals;
     string[] rows;
 
     public void Init() //init instead of start becuase start runs after GetLabelAndVals is called
     {
-        baseData = Resources.Load<TextAsset>("MNIST/mnist_train");
-        rows = baseData.text.Split("\n"); // list with each index being a 785 long string with comma separators, first row is headings
+        //baseData = Resources.Load<TextAsset>("MNIST/mnist_train");
+        rows = MNISTData.text.Split("\n"); // list with each index being a 785 long string with comma separators, first row is headings
     }
 
     public void GetLabelAndVals(ref int labelPtr, ref int[] valsPtr, int index) // pointer allows you to reference the var you pass in

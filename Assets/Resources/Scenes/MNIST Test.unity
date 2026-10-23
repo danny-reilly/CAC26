@@ -229,6 +229,7 @@ MonoBehaviour:
   numRowsCols: 28
   drawRadius: 2
   convertArray: 
+  centeredGridArray: 
 --- !u!114 &53045570
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -343,6 +344,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4561923212738be408c93eba997579f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  MNISTData: {fileID: 4900000, guid: 4803b8ebc4c55314daac1517b07a707e, type: 3}
+  extendedMNISTData: {fileID: 4900000, guid: c9faaa839fb12d64795e54b6f81bff5d, type: 3}
   label: 0
   vals: 
 --- !u!4 &265154877
