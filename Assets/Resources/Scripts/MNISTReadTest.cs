@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class MNISTReadTest : MonoBehaviour
+public class MNISTReadTest
 {
 
     // Of course, all of the below is a formatted CSV, and by default it is just a string, commas separating collums and newlines separating rows
@@ -17,8 +17,10 @@ public class MNISTReadTest : MonoBehaviour
 
     public void Init() //init instead of start becuase start runs after GetLabelAndVals is called
     {
-        //baseData = Resources.Load<TextAsset>("MNIST/mnist_train");
+        MNISTData = Resources.Load<TextAsset>("MNIST/mnist_train");
+        extendedMNISTData = Resources.Load<TextAsset>("MNIST/emnist-byclass-train");
         rows = MNISTData.text.Split("\n"); // list with each index being a 785 long string with comma separators, first row is headings
+        //string[] gib = extendedMNISTData.text.Split("\n"); // did this as a test and it took 15 seconds to load
     }
 
     public void GetLabelAndVals(ref int labelPtr, ref int[] valsPtr, int index) // pointer allows you to reference the var you pass in

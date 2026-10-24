@@ -52,9 +52,16 @@ public class DrawDigits : MonoBehaviour
         resetCanvas.performed += ctx => erase();
     }
 
-    private void OnEnable() => mouseClick.Enable();
-    private void OnDisable() => mouseClick.Disable();
-
+    private void OnEnable()
+    {
+        mouseClick.Enable();
+        resetCanvas.Enable();
+    }
+    private void OnDisable()
+    {
+        mouseClick.Disable();
+        resetCanvas.Disable();   
+    }
 
 
     // Update is called once per frame
@@ -109,12 +116,6 @@ public class DrawDigits : MonoBehaviour
         // used to check if the grid pos changed since last frame
         lastPixelX = pixelCoordX;
         lastPixelY = pixelCoordY;
-
-
-        if (Keyboard.current.eKey.wasPressedThisFrame)
-        {
-            erase();
-        }
 
 
         centerImg();
