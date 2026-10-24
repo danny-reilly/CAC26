@@ -24,6 +24,7 @@ public class DrawDigits : MonoBehaviour
     public int[,] grid;
     public int[] convertArray;
     int[,] centeredGrid;
+    int[,] fixedCenteredGrid;
     public int[] centeredGridArray;
 
     int lastPixelX, lastPixelY;
@@ -146,11 +147,13 @@ public class DrawDigits : MonoBehaviour
     void centerImg()
     {
         centeredGrid = new int[numRowsCols, numRowsCols];
+        fixedCenteredGrid = new int[numRowsCols, numRowsCols];
         for (int i = 0; i < numRowsCols; i++)
         {
             for (int j = 0; j < numRowsCols; j++)
             {
                 centeredGrid[i, j] = 0;
+                fixedCenteredGrid[i,j] = 0;
             }
         }
 
@@ -211,9 +214,14 @@ public class DrawDigits : MonoBehaviour
             }
 
         }
-
-
-        centeredGridArray = centeredGrid.Cast<int>().ToArray();
+        for(int i=0; i<centeredGrid.GetLength(0); i++)
+        {
+            for(int j=0; j<centeredGrid.GetLength(0); j++)
+            {
+                fixedCenteredGrid[i, j] = centeredGrid[j, i];
+            }
+        }
+        centeredGridArray = fixedCenteredGrid.Cast<int>().ToArray();
         texture = imgGen.createImg(28, centeredGrid.Cast<int>().ToArray());
         Rect rect = new Rect(0, 0, centerImage.rectTransform.rect.width, centerImage.rectTransform.rect.height);
         Vector2 pivot = new Vector2(0.5f, 0.5f);
