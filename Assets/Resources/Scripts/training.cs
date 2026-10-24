@@ -107,7 +107,7 @@ public class training : MonoBehaviour
                     nn.backprop();
                 }
                 nn.applyBackprop(batchSize);
-                //Debug.Log("batch " + i + "/" + (maxTrainImg / batchSize) + " complete (" + (epoch + 1) + "/" + epochNum + ")");
+                Debug.Log("batch " + i + "/" + (maxTrainImg / batchSize) + " complete (" + (epoch + 1) + "/" + epochNum + ")");
                 yield return null;
             }
 
@@ -173,7 +173,7 @@ public class training : MonoBehaviour
 
     IEnumerator testNetwork(int epoch) {
         int correctNum = 0;
-        for (int i = 0; i < maxTestImg; i++)
+        for (int i = 0; i < 1000; i++)
         {
             mr.GetLabelAndVals(ref imgLabel, ref inputsInt, i);
             //imgLabel;
@@ -196,14 +196,15 @@ public class training : MonoBehaviour
             //if guess was correct
             if(best == imgLabel)
             {
-                Debug.Log("correct (" + i + "/10000)");
+                //Debug.Log("correct (" + i + "/" + maxTestImg + ")");
                 correctNum++;
             } else
             {
-                Debug.Log("incorrect (" + i + "/10000), (correct = " + imgLabel + ")");
+                //Debug.Log("incorrect (" + i + "/" + maxTestImg + "), (correct = " + imgLabel + ")");
             }
+            //yield return null;
         }
-        Debug.Log(correctNum + "/" + maxTestImg + "correct for #" + epoch + ", (" + ((float)correctNum /maxTestImg) + "%)");
+        Debug.Log(correctNum + "/1000" + "correct for #" + epoch + ", (" + ((float)correctNum / 1000) + "%)");
         yield return null;
     }
 }
