@@ -17,8 +17,8 @@ public class MNISTRead : MonoBehaviour
 
     public void Init() //init instead of start becuase start runs after GetLabelAndVals is called
     {
-        rows = Resources.Load<TextAsset>("MNIST/emnist-letters-train").text.Split("\n"); // list with each index being a 785 long string with comma separators, first row is headings
-        rowsTest = Resources.Load<TextAsset>("MNIST/emnist-letters-test").text.Split("\n");
+        rows = Resources.Load<TextAsset>("MNIST/emnist_letters_train").text.Split("\n"); // list with each index being a 785 long string with comma separators, first row is headings
+        rowsTest = Resources.Load<TextAsset>("MNIST/emnist_letters_test").text.Split("\n");
         //Debug.Log(rows.Length);
     }
 
@@ -67,6 +67,6 @@ public class MNISTRead : MonoBehaviour
 
     public char GetCharFromLabelLet(int label)
     {
-        return (char)('A' + label-1); //retrun A-Z
+        return (char)('A' + label); //retrun A-Z
     }
 }

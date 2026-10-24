@@ -13,8 +13,8 @@ public class training : MonoBehaviour
     const int maxTestEMNIST = 116323;
     const int maxMNIST = 60000;
     const int maxTestMNIST = 10000;
-    const int maxEMNISTLet = 88800;
-    const int maxTestEMNISTLet = 14800;
+    const int maxEMNISTLet = 124800;
+    const int maxTestEMNISTLet = 20800;
     int maxTrainImg, maxTestImg;
     int[] inputsInt;
     float[] inputs;
@@ -90,7 +90,7 @@ public class training : MonoBehaviour
 
     IEnumerator MainTrain()
     {
-        for (int epoch = 0; epoch < 20000; epoch++)
+        for (int epoch = 0; epoch < epochNum; epoch++)
         {
             nn.shuffle(maxTrainImg);
             for (int i = 0; i < maxTrainImg / batchSize; i++)
@@ -99,6 +99,10 @@ public class training : MonoBehaviour
                 {
                     //change goals and inputs to match new image
                     mr.GetLabelAndVals(ref imgLabel, ref inputsInt, nn.shuffledMNISTIndex[i * batchSize + j], true);
+                    if (charNum == 26)
+                    {
+                        imgLabel--;
+                    }
                     nn.changeGoals(goalsToFloats(imgLabel));
                     nn.changeInputs(intsToFloats(inputsInt));
 
@@ -179,10 +183,13 @@ public class training : MonoBehaviour
 
     IEnumerator testNetwork(int epoch) {
         int correctNum = 0;
-        for (int i = 0; i < 10000; i++)
+        for (int i = 0; i < maxTestEMNISTLet; i+=10)
         {
             mr.GetLabelAndVals(ref imgLabel, ref inputsInt, i, false);
-            //imgLabel;
+            if(charNum == 26)
+            {
+                imgLabel--;
+            }
             nn.changeInputs(intsToFloats(inputsInt));
             nn.runNeuralNetwork();
 
@@ -190,7 +197,7 @@ public class training : MonoBehaviour
             float[] outputs = nn.getOutput();
             int best = 0;
             float bestValue = 0;
-            for(int j = 0; j < 10; j++)
+            for(int j = 0; j < charNum; j++)
             {
                 if (outputs[j] > bestValue)
                 {
@@ -210,7 +217,7 @@ public class training : MonoBehaviour
             }
             //yield return null;
         }
-        Debug.Log(correctNum + "/10000" + "correct for #" + epoch + ", (" + ((float)correctNum / 100) + "%)");
+        Debug.Log(correctNum + "/" + (maxEMNISTLet/10) + "correct for #" + epoch + ", (" + ((float)100*correctNum / (maxTestEMNISTLet/10)) + "%)");
         yield return null;
     }
 
