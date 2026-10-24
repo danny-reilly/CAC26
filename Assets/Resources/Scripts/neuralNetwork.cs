@@ -132,9 +132,9 @@ public class neuralNetwork
     {
 
         //////// get data from .dat files
-        string weightsPath = Application.dataPath + "/Resources/NNData/weights45.dat";
-        string biasesPath = Application.dataPath + "/Resources/NNData/biases45.dat";
-        string layersPath = Application.dataPath + "/Resources/NNData/layers45.dat";
+        string weightsPath = Application.dataPath + "/Resources/NNData/AAAweights.dat";
+        string biasesPath = Application.dataPath + "/Resources/NNData/AAAbiases.dat";
+        string layersPath = Application.dataPath + "/Resources/NNData/AAAlayers.dat";
 
         //set layers
         using (BinaryReader reader = new BinaryReader(File.Open(layersPath, FileMode.Open)))
@@ -171,10 +171,12 @@ public class neuralNetwork
 
         //set biases
         biases = new float[layerSizes.Length - 1][];
+        biasChanges = new float[layerSizes.Length - 1][];
         for (int layerNum = 0; layerNum < layerSizes.Length - 1; layerNum++)
         {
             //intitialize each layer with y neurons
             biases[layerNum] = new float[layerSizes[layerNum + 1]];
+            biasChanges[layerNum] = new float[layerSizes[layerNum + 1]];
         }
 
         using (BinaryReader reader = new BinaryReader(File.Open(biasesPath, FileMode.Open)))
@@ -200,16 +202,19 @@ public class neuralNetwork
 
         //set weights
         weights = new float[layerSizes.Length - 1][][];
+        weightChanges = new float[layerSizes.Length - 1][][];
         for (int layerNum = 0; layerNum < layerSizes.Length - 1; layerNum++)
         {
             //intitialize each layer with y neurons
             weights[layerNum] = new float[layerSizes[layerNum]][];
+            weightChanges[layerNum] = new float[layerSizes[layerNum]][];
 
             //initialize each neuron with z weights
             //z = amount of neurons in next layer
             for (int neuronNum = 0; neuronNum < layerSizes[layerNum]; neuronNum++)
             {
                 weights[layerNum][neuronNum] = new float[layerSizes[layerNum + 1]];
+                weightChanges[layerNum][neuronNum] = new float[layerSizes[layerNum + 1]];
             }
         }
 

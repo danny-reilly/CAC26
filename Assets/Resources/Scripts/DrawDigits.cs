@@ -214,14 +214,16 @@ public class DrawDigits : MonoBehaviour
             }
 
         }
-        for(int i=0; i<centeredGrid.GetLength(0); i++)
+        /*for(int i=0; i<centeredGrid.GetLength(0); i++)
         {
             for(int j=0; j<centeredGrid.GetLength(0); j++)
             {
                 fixedCenteredGrid[i, j] = centeredGrid[j, i];
             }
-        }
-        centeredGridArray = fixedCenteredGrid.Cast<int>().ToArray();
+        }*/
+
+
+        centeredGridArray = centeredGrid.Cast<int>().ToArray(); //fixedCenteredGrid.Cast<int>().ToArray();
         texture = imgGen.createImg(28, centeredGrid.Cast<int>().ToArray());
         Rect rect = new Rect(0, 0, centerImage.rectTransform.rect.width, centerImage.rectTransform.rect.height);
         Vector2 pivot = new Vector2(0.5f, 0.5f);
