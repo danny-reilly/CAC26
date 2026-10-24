@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class imageGen : MonoBehaviour
 {
-    MNISTReadTest mrt = new MNISTReadTest();
+    MNISTRead mr = new MNISTRead();
     int label;
     int[] testPixels;
     public int imgNum;
@@ -16,8 +16,8 @@ public class imageGen : MonoBehaviour
     
     void Start()
     {
-        mrt.Init();
-        mrt.GetLabelAndVals(ref label, ref testPixels, imgNum);
+        mr.Init();
+        mr.GetLabelAndVals(ref label, ref testPixels, imgNum);
         CreateImage();
     }
 
