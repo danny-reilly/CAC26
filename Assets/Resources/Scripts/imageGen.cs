@@ -17,7 +17,7 @@ public class imageGen : MonoBehaviour
     void Start()
     {
         mr.Init();
-        mr.GetLabelAndVals(ref label, ref testPixels, imgNum);
+        mr.GetLabelAndVals(ref label, ref testPixels, imgNum, true);
         CreateImage();
     }
 

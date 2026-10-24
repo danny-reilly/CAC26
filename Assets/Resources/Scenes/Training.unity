@@ -292,11 +292,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b2007429ba3fd645a75d47597606bd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::training
-  hiddenLayers: 2800000028000000
-  charNum: 62
+  hiddenLayers: 28000000280000002800000028000000
+  charNum: 26
   train: 1
-  learnRate: 0.05
-  batchSize: 100
+  learnRate: 0.01
+  batchSize: 32
   epochNum: 200
 --- !u!1 &1098671433
 GameObject:

@@ -3,32 +3,35 @@ using System.Collections.Generic;
 
 public class MNISTRead : MonoBehaviour
 {
-
+    int[] byMergeLowercase = { 97, 98, 100, 101, 102, 103, 104, 110, 113, 114, 116 };
     // Of course, all of the below is a formatted CSV, and by default it is just a string, commas separating collums and newlines separating rows
 
     // MNIST (in CSV format) is basically 1 big table like a google sheet where the first collumn is the label (what number the image should be) and the last 784 are the 0-255 representing the brightness of the pixel.
     // In the last 784 collumns, the format iterates between the pixels like (1, 1) (1, 2) (1, 3) ........ (1, 28) (2, 1) (2, 2) all the way to (28, 28)
 
-    TextAsset MNISTData;
-    TextAsset extendedMNISTData;
+
     public int label;
     public int[] vals;
     string[] rows;
+    string[] rowsTest;
 
     public void Init() //init instead of start becuase start runs after GetLabelAndVals is called
     {
-        MNISTData = Resources.Load<TextAsset>("MNIST/mnist_train");
-        extendedMNISTData = Resources.Load<TextAsset>("MNIST/emnist-byclass-train");
-        rows = MNISTData.text.Split("\n"); // list with each index being a 785 long string with comma separators, first row is headings
-        //string[] gib = extendedMNISTData.text.Split("\n"); // did this as a test and it took 15 seconds to load
-
-        rows = Resources.Load<TextAsset>("MNIST/emnist-byclass-train").text.Split("\n"); // list with each index being a 785 long string with comma separators, first row is headings
+        rows = Resources.Load<TextAsset>("MNIST/emnist-letters-train").text.Split("\n"); // list with each index being a 785 long string with comma separators, first row is headings
+        rowsTest = Resources.Load<TextAsset>("MNIST/emnist-letters-test").text.Split("\n");
         //Debug.Log(rows.Length);
     }
 
-    public void GetLabelAndVals(ref int labelPtr, ref int[] valsPtr, int index) // pointer allows you to reference the var you pass in
+    public void GetLabelAndVals(ref int labelPtr, ref int[] valsPtr, int index, bool training) // pointer allows you to reference the var you pass in
     {
-        string[] currentRow = rows[index+1].Split(","); // +1 accounts for heading row
+        string[] currentRow;
+        if (training)
+        {
+            currentRow = rows[index + 1].Split(",");
+        } else
+        {
+            currentRow = rowsTest[index + 1].Split(","); // +1 accounts for heading row
+        }
 
         int localLabel;
         int.TryParse(currentRow[0], out localLabel);
@@ -46,7 +49,7 @@ public class MNISTRead : MonoBehaviour
     }
 
 
-    public char GetCharFromLabel(int label)
+    public char GetCharFromLabelByclass(int label)
     {
         if (label < 10)
         {
@@ -57,7 +60,13 @@ public class MNISTRead : MonoBehaviour
             return (char)('A' + (label - 10)); //retrun A-Z
         } else
         {
-            return (char)('a' + (label - 36));
+            return (char)(byMergeLowercase[label - 36]);
+            //return (char)('a' + (label - 36));
         }
+    }
+
+    public char GetCharFromLabelLet(int label)
+    {
+        return (char)('A' + label-1); //retrun A-Z
     }
 }

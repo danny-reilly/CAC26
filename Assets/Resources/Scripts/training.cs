@@ -13,6 +13,8 @@ public class training : MonoBehaviour
     const int maxTestEMNIST = 116323;
     const int maxMNIST = 60000;
     const int maxTestMNIST = 10000;
+    const int maxEMNISTLet = 88800;
+    const int maxTestEMNISTLet = 14800;
     int maxTrainImg, maxTestImg;
     int[] inputsInt;
     float[] inputs;
@@ -39,10 +41,14 @@ public class training : MonoBehaviour
         {
             maxTestImg = maxTestMNIST;
             maxTrainImg = maxMNIST;
-        } else if(charNum == 62)
+        } else if(charNum == 62 || charNum == 47)
         {
             maxTestImg = maxTestEMNIST;
             maxTrainImg = maxEMNIST;
+        } else if(charNum == 26)
+        {
+            maxTestImg = maxTestEMNISTLet;
+            maxTrainImg = maxEMNISTLet;
         }
         
         uiRoot = GameObject.Find("UIDocument").GetComponent<UIDocument>().rootVisualElement;
@@ -52,7 +58,7 @@ public class training : MonoBehaviour
         //get an image from mnist and take data from the image
         mr = new MNISTRead();
         mr.Init();
-        mr.GetLabelAndVals(ref imgLabel, ref inputsInt, 0);
+        mr.GetLabelAndVals(ref imgLabel, ref inputsInt, 0, true);
 
         //set goals and inputs
         goals = goalsToFloats(imgLabel);
@@ -65,7 +71,7 @@ public class training : MonoBehaviour
         {
             //train
             nn.trainingInitialization();
-            StartCoroutine(mainTrain());
+            StartCoroutine(MainTrain());
         } else
         {
             /////// load nn
@@ -75,30 +81,24 @@ public class training : MonoBehaviour
             }
             nn.loadInitialization();
             nn.runNeuralNetwork();
-            updateText();
+            //updateText();
         }
 
-        //for testing accuracy
-        /*
-        nn.loadInitialization();
-        nn.runNeuralNetwork();
-        StartCoroutine(testNetwork());
-        */
+        //StartCoroutine(TestDataset());
     }
 
 
-    IEnumerator mainTrain()
+    IEnumerator MainTrain()
     {
-        for (int epoch = 0; epoch < 200; epoch++)
+        for (int epoch = 0; epoch < 20000; epoch++)
         {
             nn.shuffle(maxTrainImg);
-            Debug.Log("john fraction: " + (maxTrainImg / batchSize));
             for (int i = 0; i < maxTrainImg / batchSize; i++)
             {
                 for (int j = 0; j < batchSize; j++)
                 {
                     //change goals and inputs to match new image
-                    mr.GetLabelAndVals(ref imgLabel, ref inputsInt, nn.shuffledMNISTIndex[i * batchSize + j]);
+                    mr.GetLabelAndVals(ref imgLabel, ref inputsInt, nn.shuffledMNISTIndex[i * batchSize + j], true);
                     nn.changeGoals(goalsToFloats(imgLabel));
                     nn.changeInputs(intsToFloats(inputsInt));
 
@@ -109,10 +109,17 @@ public class training : MonoBehaviour
                 nn.applyBackprop(batchSize);
                 Debug.Log("batch " + i + "/" + (maxTrainImg / batchSize) + " complete (" + (epoch + 1) + "/" + epochNum + ")");
                 yield return null;
+
+
+                if (i % 1000 == 0)
+                {
+                    StartCoroutine(testNetwork(epoch));
+                }
             }
 
             nn.saveNN(epoch);
             StartCoroutine(testNetwork(epoch));
+            yield return null;
         }
 
     }
@@ -122,7 +129,7 @@ public class training : MonoBehaviour
 
     void Update()
     {
-        if (!train)
+       if (!train)
         {
             if (dd != null)
             {
@@ -160,11 +167,10 @@ public class training : MonoBehaviour
         topChars = Enumerable.Range(0, charNum)
             .OrderBy(index => -nn.getOutput()[index]) // Change to OrderByDescending for high-to-low
             .ToList();
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 23; i++)
         {
-            Debug.Log(nn.getOutput()[61]);
             uiRoot.Q<Label>(i + "").text =
-            mr.GetCharFromLabel(topChars[i]) + ": " + Mathf.Round(10000 * nn.getOutput()[topChars[i]]) / 100 + "%";
+            mr.GetCharFromLabelLet(topChars[i]) + ": " + Mathf.Round(10000 * nn.getOutput()[topChars[i]]) / 100 + "%";
         }
     }
 
@@ -173,9 +179,9 @@ public class training : MonoBehaviour
 
     IEnumerator testNetwork(int epoch) {
         int correctNum = 0;
-        for (int i = 0; i < 1000; i++)
+        for (int i = 0; i < 10000; i++)
         {
-            mr.GetLabelAndVals(ref imgLabel, ref inputsInt, i);
+            mr.GetLabelAndVals(ref imgLabel, ref inputsInt, i, false);
             //imgLabel;
             nn.changeInputs(intsToFloats(inputsInt));
             nn.runNeuralNetwork();
@@ -193,8 +199,8 @@ public class training : MonoBehaviour
                 }
             }
 
-            //if guess was correct
-            if(best == imgLabel)
+            //if guess was correct (capital or lowercase)
+            if(best == imgLabel || (imgLabel < 36 && best == imgLabel + 26) || (imgLabel >= 36 && best == imgLabel - 26))
             {
                 //Debug.Log("correct (" + i + "/" + maxTestImg + ")");
                 correctNum++;
@@ -204,7 +210,33 @@ public class training : MonoBehaviour
             }
             //yield return null;
         }
-        Debug.Log(correctNum + "/1000" + "correct for #" + epoch + ", (" + ((float)correctNum / 1000) + "%)");
+        Debug.Log(correctNum + "/10000" + "correct for #" + epoch + ", (" + ((float)correctNum / 100) + "%)");
         yield return null;
     }
+
+
+    IEnumerator TestDataset()
+    {
+        int[] dataset = new int[47];
+
+        for (int i = 0; i < maxEMNIST-10; i++)
+        {
+            mr.GetLabelAndVals(ref imgLabel, ref inputsInt, i, false);
+            dataset[imgLabel]++;
+
+            if(i%1000 == 0)
+            {
+                Debug.Log("loading john " + i);
+                yield return null;
+            }
+        }
+
+        for (int i = 0; i < charNum; i++)
+        {
+            Debug.Log(mr.GetCharFromLabelLet(i) + ": " + dataset[i] + ", " + ((float)dataset[i]/maxEMNIST*100) + "%");
+            yield return null;
+        }
+
+    }
+
 }
