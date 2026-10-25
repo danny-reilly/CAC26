@@ -17,7 +17,7 @@ public class bgMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        bgRenderer.sprite = bgImgs[Mathf.FloorToInt(System.DateTime.UtcNow.Millisecond/333)];
+        bgRenderer.sprite = bgImgs[Mathf.FloorToInt(3*System.DateTime.UtcNow.Millisecond/1000)];
 
     }
 }

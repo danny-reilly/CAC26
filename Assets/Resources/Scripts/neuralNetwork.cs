@@ -305,7 +305,7 @@ public class neuralNetwork
         //set last layer neuron derivatives
         for (int j = 0; j < layerSizes[lastLayer]; j++)
         {
-            neuronDerivs[lastLayer][j] = 2 * (neurons[lastLayer][j] - goals[j]);
+            neuronDerivs[lastLayer][j] = /*2 **/ (neurons[lastLayer][j] - goals[j]);
         }
 
         //set all the neuron derivatives starting from 2nd to last and going back
@@ -388,8 +388,9 @@ public class neuralNetwork
     {
         if (sigmoid)
         {
-            float s = Mathf.Exp(-x);
-            return s / Mathf.Pow(1 + s, 2);
+            return 1;
+            /*float s = Mathf.Exp(-x);
+            return s / Mathf.Pow(1 + s, 2);*/
         }
         else
         {

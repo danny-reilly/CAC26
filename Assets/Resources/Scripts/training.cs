@@ -89,8 +89,6 @@ public class training : MonoBehaviour
             nn.runNeuralNetwork();
             //updateText();
         }
-
-        //StartCoroutine(TestDataset());
     }
 
 
@@ -121,7 +119,7 @@ public class training : MonoBehaviour
                 yield return null;
 
 
-                if (i % 1000 == 0)
+                if (i % 200 == 0)
                 {
                     StartCoroutine(testNetwork(epoch));
                 }
@@ -223,8 +221,8 @@ public class training : MonoBehaviour
 
 
             float[] outputs = nn.getOutput();
-            int best = 0;
-            float bestValue = 0;
+            int best = -1;
+            float bestValue = -Mathf.Infinity;
             for(int j = 0; j < charNum; j++)
             {
                 if (outputs[j] > bestValue)
@@ -241,11 +239,18 @@ public class training : MonoBehaviour
                 correctNum++;
             } else
             {
-                //Debug.Log("incorrect (" + i + "/" + maxTestImg + "), (correct = " + imgLabel + ")");
+                //Debug.Log("incorrect (" + i + "/" + maxTestImg + "), (" + outputs[imgLabel] + ")");
             }
-            //yield return null;
+
+
+
+            /*Texture2D texture = ig.createImg(28, inputsInt);
+            GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f), 28 / 10f);
+            updateText();
+
+            yield return null;*/
         }
-        Debug.Log(correctNum + "/" + (maxEMNISTLet/10) + "correct for #" + epoch + ", (" + ((float)100*correctNum / (maxTestEMNISTLet/10)) + "%)");
+        Debug.Log(correctNum + "/" + (maxTestEMNISTLet/10) + "correct for #" + epoch + ", (" + ((float)100*correctNum / (maxTestEMNISTLet/10)) + "%)");
         yield return null;
     }
 
