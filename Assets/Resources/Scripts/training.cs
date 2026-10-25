@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.AdaptivePerformance.Provider;
 using UnityEngine.UIElements;
@@ -19,24 +20,29 @@ public class training : MonoBehaviour
     int[] inputsInt;
     float[] inputs;
     [SerializeField] int[] hiddenLayers;
-    [SerializeField] int charNum; //number of chars (num = 10, num&let = 62)
+    public int charNum; //number of chars (num = 10, num&let = 62)
     static float[] goals; 
     int imgLabel;
-    List<int> topChars;
+    [HideInInspector]
+    public List<int> topChars;
 
     [SerializeField] bool train = true;
     [SerializeField] float learnRate = 0.01f;
     [SerializeField] int batchSize = 100;
     [SerializeField] int epochNum = 20;
-
-    neuralNetwork nn;
+    [HideInInspector]
+    public neuralNetwork nn;
     MNISTRead mr;
     DrawDigits dd;
     imgGenerator ig;
+    public guessWord gw;
 
     VisualElement uiRoot;
+    public TMP_Text leaderboardText;
+    public string startingLeaderboardText;
     public void Start()
     {
+        startingLeaderboardText = leaderboardText.text;
         if(charNum == 10)
         {
             maxTestImg = maxTestMNIST;
@@ -128,9 +134,6 @@ public class training : MonoBehaviour
 
     }
 
-
-
-
     void Update()
     {
        if (!train)
@@ -139,8 +142,20 @@ public class training : MonoBehaviour
             {
                 nn.changeInputs(intsToFloats(dd.centeredGridArray));
             }
-            nn.runNeuralNetwork();
-            updateText();
+            if (!dd.convertArray.All(i => i == 0) && !gw.guessingWord)
+            {
+                nn.runNeuralNetwork();
+                updateText(); 
+            } else if(!gw.guessingWord)
+            {
+                leaderboardText.text = gw.finalWord.Length <= 0 ? startingLeaderboardText : $"Was your word: \"{gw.finalWord}\" ?";
+            } else
+            {
+                nn.runNeuralNetwork();
+                updateText(); 
+                leaderboardText.text = "No Guesses While\nWriting Word";
+            }
+            
         }
     }
 
@@ -166,16 +181,29 @@ public class training : MonoBehaviour
     }
 
 
-    void updateText()
+    public void updateText()
     {
+        string tempLeaderboard = "";
         topChars = Enumerable.Range(0, charNum)
             .OrderBy(index => -nn.getOutput()[index]) // Change to OrderByDescending for high-to-low
             .ToList();
-        for (int i = 0; i < 23; i++)
+        for (int i = 0; i < 5; i++)
         {
-            uiRoot.Q<Label>(i + "").text =
-            mr.GetCharFromLabelLet(topChars[i]) + ": " + Mathf.Round(10000 * nn.getOutput()[topChars[i]]) / 100 + "%";
+            //uiRoot.Q<Label>(i + "").text =
+            if(Mathf.Round(10000 * nn.getOutput()[topChars[i]]) <= 0 || gw.guessingWord)
+            {
+                continue;
+            }
+            if(i != 0) {
+                tempLeaderboard += $"<color=#173717>{mr.GetCharFromLabelLet(topChars[i])} ({Mathf.Round(10000 * nn.getOutput()[topChars[i]]) / 100}% Certainty)</color>\n";
+            } else
+            {
+                tempLeaderboard += $"<size=55>{mr.GetCharFromLabelLet(topChars[i])} ({Mathf.Round(10000 * nn.getOutput()[topChars[i]]) / 100}% Certainty)\n</size>";
+            }
+            
+            
         }
+        leaderboardText.text = tempLeaderboard;
     }
 
 

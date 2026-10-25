@@ -29,6 +29,7 @@ public class DrawDigits : MonoBehaviour
 
     int lastPixelX, lastPixelY;
     imgGenerator imgGen = new imgGenerator();
+    public training training;
 
     void Awake()
     {
@@ -134,7 +135,7 @@ public class DrawDigits : MonoBehaviour
         mouseDown = false;
     }
 
-    void erase()
+    public void erase()
     {
         for (int i = 0; i < 28; i++) {
             for (int j = 0; j < 28; j++)
@@ -142,6 +143,7 @@ public class DrawDigits : MonoBehaviour
                 grid[i, j] = 0;
             }
         }
+        training.leaderboardText.text = training.startingLeaderboardText;
     }
 
     void centerImg()
