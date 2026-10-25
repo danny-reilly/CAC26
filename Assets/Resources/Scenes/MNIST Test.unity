@@ -130,6 +130,7 @@ GameObject:
   - component: {fileID: 42058205}
   - component: {fileID: 42058204}
   - component: {fileID: 42058203}
+  - component: {fileID: 42058206}
   m_Layer: 5
   m_Name: UIDocument
   m_TagString: Untagged
@@ -144,7 +145,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 42058202}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6b2007429ba3fd645a75d47597606bd0, type: 3}
   m_Name: 
@@ -197,6 +198,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &42058206
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 42058202}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4818d326c1d00554cb130aa4e17dcd79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::runNetwork
+  charNum: 26
+  topChars: 
+  gw: {fileID: 151950037}
+  leaderboardText: {fileID: 1027595577}
+  startingLeaderboardText: 
 --- !u!1 &53045568
 GameObject:
   m_ObjectHideFlags: 0
@@ -235,7 +253,7 @@ MonoBehaviour:
   drawRadius: 2
   convertArray: 
   centeredGridArray: 
-  training: {fileID: 42058203}
+  runNetwork: {fileID: 42058206}
 --- !u!114 &53045570
 MonoBehaviour:
   m_ObjectHideFlags: 0

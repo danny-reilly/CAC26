@@ -295,8 +295,9 @@ MonoBehaviour:
   hiddenLayers: 10030000000100008000000028000000
   charNum: 26
   train: 1
-  learnRate: 0.1
-  batchSize: 32
+  loadTrain: 1
+  learnRate: 0.01
+  batchSize: 100
   epochNum: 200
 --- !u!1 &1098671433
 GameObject:

@@ -6,7 +6,7 @@ using TMPro;
 
 public class guessWord : MonoBehaviour
 {
-    public training training;
+    public runNetwork runNetwork;
     public DrawDigits dd;
     public List<char> guessList = new List<char>();
     public string finalWord;
@@ -28,7 +28,7 @@ public class guessWord : MonoBehaviour
 
     public void onNextLetterClick()
     {
-        guessList.Add((char)('A' + training.topChars[0]));
+        guessList.Add((char)('A' + runNetwork.topChars[0]));
         dd.erase();
 
     }
@@ -44,7 +44,7 @@ public class guessWord : MonoBehaviour
         {
             finalWord += letter;
         }
-        training.leaderboardText.text = $"Was your word: \"{finalWord}\" ?";
+        runNetwork.leaderboardText.text = $"Was your word: \"{finalWord}\" ?";
         guessList.Clear();
     }
 

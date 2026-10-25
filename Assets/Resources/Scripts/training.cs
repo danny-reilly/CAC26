@@ -23,26 +23,20 @@ public class training : MonoBehaviour
     public int charNum; //number of chars (num = 10, num&let = 62)
     static float[] goals; 
     int imgLabel;
-    [HideInInspector]
-    public List<int> topChars;
 
-    [SerializeField] bool train = true;
+    [SerializeField] bool train;
+    [SerializeField] bool loadTrain;
     [SerializeField] float learnRate = 0.01f;
     [SerializeField] int batchSize = 100;
     [SerializeField] int epochNum = 20;
     [HideInInspector]
     public neuralNetwork nn;
     MNISTRead mr;
-    DrawDigits dd;
     imgGenerator ig;
-    public guessWord gw;
 
     VisualElement uiRoot;
-    public TMP_Text leaderboardText;
-    public string startingLeaderboardText;
     public void Start()
     {
-        startingLeaderboardText = leaderboardText.text;
         if(charNum == 10)
         {
             maxTestImg = maxTestMNIST;
@@ -76,15 +70,18 @@ public class training : MonoBehaviour
         if (train)
         {
             //train
-            nn.trainingInitialization();
+            if(loadTrain)
+            {
+                nn.loadInitialization();
+            } else
+            {
+                nn.trainingInitialization();
+            }
+
             StartCoroutine(MainTrain());
         } else
         {
             /////// load nn
-            if (GameObject.Find("Canvas") != null)
-            {
-                dd = GameObject.Find("Canvas").GetComponent<DrawDigits>();
-            }
             nn.loadInitialization();
             nn.runNeuralNetwork();
             //updateText();
@@ -99,8 +96,14 @@ public class training : MonoBehaviour
             nn.shuffle(maxTrainImg);
             for (int i = 0; i < maxTrainImg / batchSize; i++)
             {
+                if (i % 50 == 0)
+                {
+                    StartCoroutine(testNetwork(epoch));
+                }
+
                 for (int j = 0; j < batchSize; j++)
                 {
+
                     //change goals and inputs to match new image
                     mr.GetLabelAndVals(ref imgLabel, ref inputsInt, nn.shuffledMNISTIndex[i * batchSize + j], true);
                     if (charNum == 26)
@@ -117,12 +120,6 @@ public class training : MonoBehaviour
                 nn.applyBackprop(batchSize);
                 Debug.Log("batch " + i + "/" + (maxTrainImg / batchSize) + " complete (" + (epoch + 1) + "/" + epochNum + ")");
                 yield return null;
-
-
-                if (i % 200 == 0)
-                {
-                    StartCoroutine(testNetwork(epoch));
-                }
             }
 
             nn.saveNN(epoch);
@@ -132,30 +129,6 @@ public class training : MonoBehaviour
 
     }
 
-    void Update()
-    {
-       if (!train)
-        {
-            if (dd != null)
-            {
-                nn.changeInputs(intsToFloats(dd.centeredGridArray));
-            }
-            if (!dd.convertArray.All(i => i == 0) && !gw.guessingWord)
-            {
-                nn.runNeuralNetwork();
-                updateText(); 
-            } else if(!gw.guessingWord)
-            {
-                leaderboardText.text = gw.finalWord.Length <= 0 ? startingLeaderboardText : $"Was your word: \"{gw.finalWord}\" ?";
-            } else
-            {
-                nn.runNeuralNetwork();
-                updateText(); 
-                leaderboardText.text = "No Guesses While\nWriting Word";
-            }
-            
-        }
-    }
 
     float[] goalsToFloats(int num)
     {
@@ -181,27 +154,7 @@ public class training : MonoBehaviour
 
     public void updateText()
     {
-        string tempLeaderboard = "";
-        topChars = Enumerable.Range(0, charNum)
-            .OrderBy(index => -nn.getOutput()[index]) // Change to OrderByDescending for high-to-low
-            .ToList();
-        for (int i = 0; i < 5; i++)
-        {
-            //uiRoot.Q<Label>(i + "").text =
-            if(Mathf.Round(10000 * nn.getOutput()[topChars[i]]) <= 0 || gw.guessingWord)
-            {
-                continue;
-            }
-            if(i != 0) {
-                tempLeaderboard += $"<color=#173717>{mr.GetCharFromLabelLet(topChars[i])} ({Mathf.Round(10000 * nn.getOutput()[topChars[i]]) / 100}% Certainty)</color>\n";
-            } else
-            {
-                tempLeaderboard += $"<size=55>{mr.GetCharFromLabelLet(topChars[i])} ({Mathf.Round(10000 * nn.getOutput()[topChars[i]]) / 100}% Certainty)\n</size>";
-            }
-            
-            
-        }
-        leaderboardText.text = tempLeaderboard;
+       
     }
 
 
@@ -266,7 +219,7 @@ public class training : MonoBehaviour
 
             if(i%1000 == 0)
             {
-                Debug.Log("loading john " + i);
+                Debug.Log("loading " + i);
                 yield return null;
             }
         }

@@ -29,7 +29,7 @@ public class DrawDigits : MonoBehaviour
 
     int lastPixelX, lastPixelY;
     imgGenerator imgGen = new imgGenerator();
-    public training training;
+    public runNetwork runNetwork;
 
     void Awake()
     {
@@ -143,7 +143,7 @@ public class DrawDigits : MonoBehaviour
                 grid[i, j] = 0;
             }
         }
-        training.leaderboardText.text = training.startingLeaderboardText;
+        runNetwork.leaderboardText.text = runNetwork.startingLeaderboardText;
     }
 
     void centerImg()
