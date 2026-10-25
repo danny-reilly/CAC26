@@ -6,7 +6,26 @@ public class Tutorial : MonoBehaviour
 
     public TextMeshProUGUI speechText;
     string text;
-    public string[] voicelines = {"Hi, I'm John,  but my friends call me Reis.", "line2"};
+    string[] voicelines = 
+    {
+        "Woah, didn't see you there! <Color=#555555>(Press Q to continue)</Color>", 
+        "Hi, I'm John Albertson,  but my friends call me Al.", 
+        "This is my AI studio, draw any letter and it will identify it with over 90% accuracy!",
+        "Draw on this easel, and the chalkboard will show you what it thinks your letter is.",
+        "Press 'E', or the Erase Button to clear the canvas.",
+        "If you want it to guess a word you write, click on the 'Guess A Word' button.",
+        ""
+    };
+
+    string[] expressions =
+    {
+        "Surprised",
+        "Explain",
+        "Explain2",
+        "Point2",
+        "Point2",
+        "Point"
+    };
     int voiceline = 0;
     int index = 0;
     float typeSpeed;
@@ -20,7 +39,15 @@ public class Tutorial : MonoBehaviour
     public bool givingTutorial;
     public TMP_Text tutButtonText;
     public Button guessWordBtn, eraseBtn;
+    public johnMovement john;
+    AudioSource As;
 
+
+    void Start()
+    {
+        As = GetComponent<AudioSource>();
+        OnTutorialClick();
+    }
     public void OnTutorialClick()
     {
         givingTutorial = !givingTutorial;
@@ -34,7 +61,7 @@ public class Tutorial : MonoBehaviour
             UpdateText(voicelines[voiceline], 0.05f);
         } else
         {
-            tutButtonText.text = "Start Tutorial";            
+            tutButtonText.text = "Restart Tutorial";            
         }
     }
     
@@ -49,6 +76,7 @@ public class Tutorial : MonoBehaviour
 
         text = newSpeech;
         typeSpeed = speed;
+        john.ChangeJohnSprite(expressions[voiceline]);
     }
 
 
@@ -58,28 +86,41 @@ public class Tutorial : MonoBehaviour
 
     void Update()
     {
-        switchCd -= Time.deltaTime;
-        charCd -= Time.deltaTime;
-        if (typing && charCd <= 0)
+        if (givingTutorial)
         {
-            charCd = 0;
-            NewChar();
-        }
-        if (!typing && canSwitch)
-        {
-            canSwitch = false;
-            //update text here
-            UpdateText(voicelines[voiceline], 0.05f);
-        }
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            canSwitch = true;
-            if (switchCd > 0)
+            switchCd -= Time.deltaTime;
+            charCd -= Time.deltaTime;
+            if (typing && charCd <= 0)
             {
-                Skip();
+                charCd = 0;
+                NewChar();
             }
-        }
+            if (!typing && canSwitch)
+            {
+                canSwitch = false;
+                //either end tutorial or go to next voiceline
+                if (voiceline >= voicelines.Length-1)
+                {
+                    OnTutorialClick();
+                    john.ChangeJohnSprite("Explain");
+                }
+                else
+                {
+                    //update text here
+                    UpdateText(voicelines[voiceline], 0.05f);
+                }
+            }
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
+                canSwitch = true;
+                if (switchCd > 0)
+                {
+                    Skip();
+                }
+            }
 
+            john.talking = typing;
+        }
     }
 
 
@@ -90,6 +131,7 @@ public class Tutorial : MonoBehaviour
         index = 0;
         switchCd = 0;
         canSwitch = false;
+        voiceline += voiceline < voicelines.Length - 1 ? 1 : 0;
     }
 
 
@@ -99,23 +141,25 @@ public class Tutorial : MonoBehaviour
 
         if (index < text.Length)
         {
-            if (text[index].ToString() == " ")
+            if (text[index] == ' ')
             {
                 charCd = 0;
             }
             else
             {
-                //when we have sfx
-                //As.pitch = Random.Range(0.6f + pitch, 0.8f + pitch);
-                //As.PlayOneShot(As.clip);
+                As.pitch = Random.Range(0.7f, 0.9f);
+                As.PlayOneShot(As.clip);
             }
             speechText.text += text[index];
             index++;
             charCd = typeSpeed;
             //take longer on ts
-            if (text[index - 1].ToString() == "." || text[index - 1].ToString() == "!" || text[index - 1].ToString() == "?" || text[index - 1].ToString() == "-")
+            if (text[index - 1] == '.' || text[index - 1] == '!' || text[index - 1] == '?' || text[index - 1] == '-')
             {
                 charCd *= 4;
+            } else if (text[index-1] == '<')
+            {
+                Skip();
             }
         }
         else
