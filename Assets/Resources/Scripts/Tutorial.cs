@@ -8,13 +8,25 @@ public class Tutorial : MonoBehaviour
     string text;
     string[] voicelines = 
     {
-        "Woah, didn't see you there! <Color=#555555>(Press Q to continue)</Color>", 
-        "Hi, I'm John Albertson,  but my friends call me Al.", 
-        "This is my AI studio, draw any letter and it will identify it with over 90% accuracy!",
-        "Draw on this easel, and the chalkboard will show you what it thinks your letter is.",
-        "Press 'E', or the Erase Button to clear the canvas.",
-        "If you want it to guess a word you write, click on the 'Guess A Word' button.",
-        ""
+        "Woah, didn't see you there!<Color=#555555>\n(Press Q to continue)</Color>", 
+        "Hi, I'm John Albertson, but my friends call me Al.<Color=#555555>\n(Press Q to continue)</Color>", 
+        "This is my AI studio, draw any letter and it will identify it with over 90% accuracy!<Color=#555555>\n(Press Q to continue)</Color>",
+        "Draw on this canvas, and the chalkboard will show you what it thinks your letter is.<Color=#555555>\n(Press Q to continue)</Color>",
+        "Press 'E', or the Erase Button to clear the canvas.<Color=#555555>\n(Press Q to continue)</Color>",
+        "If you want it to guess a word or phrase you write, click on the 'Guess A Word' button.<Color=#555555>\n(Press Q to continue)</Color>",
+        "After clicking the 'Guess A Word' button, draw a letter and press the 'Add Current Letter' button. If you want to add a space, click 'Add Space.'<Color=#555555>\n(Press Q to continue)</Color>",
+        "Once you are all done with your word or phrase, click 'Done.'"
+    };
+
+    public string[] rightLines =
+    {
+        "Yes! I knew my AI studio could do it!"
+    };
+
+    public string[] wrongLines =
+    {
+        "Aw drat. I guess you can't win em all...<Color=#555555>\n(Press Q to continue)</Color>",
+        "If you try again, maybe it'll get it right next time!"
     };
 
     string[] expressions =
@@ -26,7 +38,7 @@ public class Tutorial : MonoBehaviour
         "Point2",
         "Point"
     };
-    int voiceline = 0;
+    public int voiceline = 0;
     int index = 0;
     float typeSpeed;
     bool typing;
@@ -36,7 +48,7 @@ public class Tutorial : MonoBehaviour
     bool  canSwitch;
     Animator theAnimator, bananimator, thatAnimator;
     public GameObject tutorialObj;
-    public bool givingTutorial;
+    public bool givingTutorial, correct, wrong;
     public TMP_Text tutButtonText;
     public Button guessWordBtn, eraseBtn;
     public johnMovement john;
@@ -61,11 +73,12 @@ public class Tutorial : MonoBehaviour
             UpdateText(voicelines[voiceline], 0.05f);
         } else
         {
+            voiceline = voicelines.Length;
             tutButtonText.text = "Restart Tutorial";            
         }
     }
     
-    void UpdateText(string newSpeech, float speed)
+    public void UpdateText(string newSpeech, float speed)
     {
         typing = true;
         speechText.text = "";
@@ -110,7 +123,7 @@ public class Tutorial : MonoBehaviour
                     UpdateText(voicelines[voiceline], 0.05f);
                 }
             }
-            if (Input.GetKeyDown(KeyCode.Q))
+            if (Input.anyKeyDown)
             {
                 canSwitch = true;
                 if (switchCd > 0)
@@ -120,7 +133,78 @@ public class Tutorial : MonoBehaviour
             }
 
             john.talking = typing;
+        } else if (correct) {
+            switchCd -= Time.deltaTime;
+            charCd -= Time.deltaTime;
+
+            if (typing && charCd <= 0)
+            {
+                charCd = 0;
+                NewChar();
+            }
+
+            if (!typing && canSwitch)
+            {
+                canSwitch = false;
+                //either end tutorial or go to next voiceline
+                if (voiceline >= rightLines.Length-1)
+                {
+                    OnTutorialClick();
+                    OnTutorialClick();
+                    john.ChangeJohnSprite("Happy");
+                }
+                else
+                {
+                    //update text here
+                    UpdateText(rightLines[voiceline], 0.05f);
+                }
+            }
+            if (Input.anyKeyDown)
+            {
+                canSwitch = true;
+                if (switchCd > 0)
+                {
+                    Skip();
+                }
+            }
+            john.talking = typing;
+        }else if (wrong) {
+            switchCd -= Time.deltaTime;
+            charCd -= Time.deltaTime;
+
+            if (typing && charCd <= 0)
+            {
+                charCd = 0;
+                NewChar();
+            }
+
+            if (!typing && canSwitch)
+            {
+                canSwitch = false;
+                //either end tutorial or go to next voiceline
+                if (voiceline >= wrongLines.Length-1)
+                {
+                    OnTutorialClick();
+                    OnTutorialClick();
+                    john.ChangeJohnSprite("Sad");
+                }
+                else
+                {
+                    //update text here
+                    UpdateText(wrongLines[voiceline], 0.05f);
+                }
+            }
+            if (Input.anyKeyDown)
+            {
+                canSwitch = true;
+                if (switchCd > 0)
+                {
+                    Skip();
+                }
+            }
+            john.talking = typing;
         }
+        
     }
 
 
