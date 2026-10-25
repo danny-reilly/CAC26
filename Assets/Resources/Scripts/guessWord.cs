@@ -30,6 +30,7 @@ public class guessWord : MonoBehaviour
     {
         guessList.Add((char)('A' + runNetwork.topChars[0]));
         dd.erase();
+        toggleText.text = guessingWord ? "Guess a Word" : "Guess a Letter";
 
     }
     public void onDoneWWordClick()
@@ -46,6 +47,7 @@ public class guessWord : MonoBehaviour
         }
         runNetwork.leaderboardText.text = $"Was your word: \"{finalWord}\" ?";
         guessList.Clear();
+        toggleText.text = guessingWord ? "Guess a Word" : "Guess a Letter";
     }
 
     public void guessWordToggle()
@@ -54,7 +56,7 @@ public class guessWord : MonoBehaviour
         guessingWord = !guessingWord;
         next.gameObject.SetActive(guessingWord);
         done.gameObject.SetActive(guessingWord);
-        toggleText.text = !guessingWord ? "Guess a Word" : "Guess a Letter";
-
+        toggleText.text = guessingWord ? "Guess a Word" : "Guess a Letter";
     }
+
 }

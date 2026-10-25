@@ -23,6 +23,7 @@ public class runNetwork : MonoBehaviour
     DrawDigits dd;
     imgGenerator ig;
     public guessWord gw;
+    public Tutorial tut;
 
     VisualElement uiRoot;
     public TMP_Text leaderboardText;
@@ -58,10 +59,19 @@ public class runNetwork : MonoBehaviour
     void Update()
     {
         nn.changeInputs(intsToFloats(dd.centeredGridArray));
-        if (!dd.convertArray.All(i => i == 0) && !gw.guessingWord)
+        if (!dd.convertArray.All(i => i == 0) && !gw.guessingWord && !tut.givingTutorial)
         {
             nn.runNeuralNetwork();
             updateText(); 
+        } else if(tut.givingTutorial)
+        {
+            dd.erase();
+            if (gw.guessingWord)
+            {
+                gw.guessList.Clear();
+                gw.guessWordToggle();
+            }
+            leaderboardText.text = "No pressing buttons\nduring the tutorial!";
         } else if(!gw.guessingWord)
         {
             leaderboardText.text = gw.finalWord.Length <= 0 ? startingLeaderboardText : $"Was your word: \"{gw.finalWord}\" ?";
