@@ -16,6 +16,12 @@ public class guessWord : MonoBehaviour
     public Button next, done, space;
     public TMP_Text toggleText;
     public GameObject rightWrongObj;
+    johnMovement john;
+
+    void Start()
+    {
+        john = GameObject.Find("John").GetComponent<johnMovement>();
+    }
 
     public void onNextLetterClick()
     {
@@ -72,11 +78,13 @@ public class guessWord : MonoBehaviour
         if(correct)
         {
             tut.UpdateText(tut.rightLines[tut.voiceline], 0.05f);
+            john.ChangeJohnSprite("Happy");
             tut.correct = true;
             tut.wrong = false;
         } else
         {
             tut.UpdateText(tut.wrongLines[tut.voiceline], 0.05f);
+            john.ChangeJohnSprite("Sad");
             tut.correct = false;
             tut.wrong = true;
         }

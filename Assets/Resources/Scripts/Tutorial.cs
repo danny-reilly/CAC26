@@ -41,7 +41,7 @@ public class Tutorial : MonoBehaviour
     public int voiceline = 0;
     int index = 0;
     float typeSpeed;
-    bool typing;
+    public bool typing;
     float charCd = 0; // cd = current dialogue?
     float switchCd = 0;
     string lastChar;
@@ -71,10 +71,13 @@ public class Tutorial : MonoBehaviour
             tutButtonText.text = "End Tutorial";
             voiceline = 0;
             UpdateText(voicelines[voiceline], 0.05f);
-        } else
+        }
+        else
         {
             voiceline = voicelines.Length;
-            tutButtonText.text = "Restart Tutorial";            
+            tutButtonText.text = "Restart Tutorial";
+            typing = false;
+            john.ChangeJohnSprite("Explain");
         }
     }
     
@@ -151,7 +154,7 @@ public class Tutorial : MonoBehaviour
                 {
                     OnTutorialClick();
                     OnTutorialClick();
-                    john.ChangeJohnSprite("Happy");
+
                 }
                 else
                 {
@@ -186,7 +189,6 @@ public class Tutorial : MonoBehaviour
                 {
                     OnTutorialClick();
                     OnTutorialClick();
-                    john.ChangeJohnSprite("Sad");
                 }
                 else
                 {
@@ -202,9 +204,9 @@ public class Tutorial : MonoBehaviour
                     Skip();
                 }
             }
-            john.talking = typing;
         }
-        
+        john.talking = typing;
+
     }
 
 
