@@ -37,7 +37,8 @@ public class Tutorial : MonoBehaviour
         "Point2",
         "Point2",
         "Point",
-        "Point"
+        "Point",
+        "Explain"
     };
     public int voiceline = 0;
     int index = 0;
@@ -76,7 +77,7 @@ public class Tutorial : MonoBehaviour
         }
         else
         {
-            voiceline = voicelines.Length;
+            voiceline = voicelines.Length-1;
             tutButtonText.text = "Restart Tutorial";
             typing = false;
             john.ChangeJohnSprite("Explain");
@@ -117,7 +118,7 @@ public class Tutorial : MonoBehaviour
             {
                 canSwitch = false;
                 //either end tutorial or go to next voiceline
-                if (voiceline >= voicelines.Length-1)
+                if (voiceline > voicelines.Length-1)
                 {
                     OnTutorialClick();
                     john.ChangeJohnSprite("Explain");
@@ -152,7 +153,7 @@ public class Tutorial : MonoBehaviour
             {
                 canSwitch = false;
                 //either end tutorial or go to next voiceline
-                if (voiceline >= rightLines.Length-1)
+                if (voiceline > rightLines.Length-1)
                 {
                     OnTutorialClick();
                     OnTutorialClick();
@@ -188,7 +189,7 @@ public class Tutorial : MonoBehaviour
             {
                 canSwitch = false;
                 //either end tutorial or go to next voiceline
-                if (voiceline >= wrongLines.Length-1)
+                if (voiceline > wrongLines.Length-1)
                 {
                     OnTutorialClick();
                     OnTutorialClick();
@@ -222,7 +223,7 @@ public class Tutorial : MonoBehaviour
         index = 0;
         switchCd = 0;
         canSwitch = false;
-        voiceline += voiceline < voicelines.Length - 1 ? 1 : 0;
+        voiceline += voiceline < voicelines.Length ? 1 : 0;
     }
 
 

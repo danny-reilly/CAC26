@@ -19,7 +19,6 @@ public class runNetwork : MonoBehaviour
     [HideInInspector]
     public List<int> topChars;
     neuralNetwork nn;
-    MNISTRead mr;
     DrawDigits dd;
     imgGenerator ig;
     public guessWord gw;
@@ -36,16 +35,11 @@ public class runNetwork : MonoBehaviour
 
         ig = new imgGenerator();        
 
-        //get an image from mnist and take data from the image
-        mr = new MNISTRead();
-        mr.Init();
-        mr.GetLabelAndVals(ref imgLabel, ref inputsInt, 0, true);
 
-        //set goals and inputs
-        goals = goalsToFloats(imgLabel);
-        inputs = intsToFloats(inputsInt);
 
         int[] empty = new int[0];
+        float[] goals = new float[26];
+        float[] inputs = new float[784];
         nn = new neuralNetwork(inputs, empty, goals, 0);
 
         /////// load nn
@@ -74,6 +68,8 @@ public class runNetwork : MonoBehaviour
             leaderboardText.text = "No pressing buttons\nduring the tutorial!";
         } else if(gw.guessingWord)
         {
+            nn.runNeuralNetwork();
+            updateText();
             leaderboardText.text = gw.finalWord.Length <= 0 ? startingLeaderboardText : $"Was your word: \"{gw.finalWord}\" ?";
         } else
         {
@@ -114,15 +110,15 @@ public class runNetwork : MonoBehaviour
         for (int i = 0; i < 5; i++)
         {
             //uiRoot.Q<Label>(i + "").text =
-            if(Mathf.Round(10000 * nn.getOutput()[topChars[i]]) <= 0)////////////////////////add back//////////////////////////////////////////// || gw.guessingWord)
+            if(Mathf.Round(10000 * nn.getOutput()[topChars[i]]) <= 0|| gw.guessingWord)
             {
                 continue;
             }
             if(i != 0) {
-                tempLeaderboard += $"<color=#173717>{mr.GetCharFromLabelLet(topChars[i])} ({Mathf.Round(10000 * nn.getOutput()[topChars[i]]) / 100}% Certainty)</color>\n";
+                tempLeaderboard += $"<color=#173717>{GetCharFromLabelLet(topChars[i])} ({Mathf.Round(10000 * nn.getOutput()[topChars[i]]) / 100}% Certainty)</color>\n";
             } else
             {
-                tempLeaderboard += $"<size=55>{mr.GetCharFromLabelLet(topChars[i])} ({Mathf.Round(10000 * nn.getOutput()[topChars[i]]) / 100}% Certainty)\n</size>";
+                tempLeaderboard += $"<size=55>{GetCharFromLabelLet(topChars[i])} ({Mathf.Round(10000 * nn.getOutput()[topChars[i]]) / 100}% Certainty)\n</size>";
             }
             
             
@@ -130,4 +126,8 @@ public class runNetwork : MonoBehaviour
         leaderboardText.text = tempLeaderboard;
     }
 
+    char GetCharFromLabelLet(int label)
+    {
+        return (char)('A' + label); //retrun A-Z
+    }
 }

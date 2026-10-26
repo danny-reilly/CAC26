@@ -131,13 +131,19 @@ public class neuralNetwork
     public void loadInitialization()
     {
 
-        //////// get data from .dat files
-        string weightsPath = Application.dataPath + "/Resources/NNData/AAAweights.dat";
-        string biasesPath = Application.dataPath + "/Resources/NNData/AAAbiases.dat";
-        string layersPath = Application.dataPath + "/Resources/NNData/AAAlayers.dat";
 
+        //////// get data from .dat files
+        TextAsset layersAsset = Resources.Load<TextAsset>("NNData/AAAlayers");
+        TextAsset biasesAsset = Resources.Load<TextAsset>("NNData/AAAbiases");
+        TextAsset weightsAsset = Resources.Load<TextAsset>("NNData/AAAweights");
+
+        if (layersAsset == null || biasesAsset == null || weightsAsset == null)
+        {
+            Debug.LogError("Could not load NN data from Resources/NNData");
+            return;
+        }
         //set layers
-        using (BinaryReader reader = new BinaryReader(File.Open(layersPath, FileMode.Open)))
+        using (BinaryReader reader = new BinaryReader(new MemoryStream(layersAsset.bytes)))
         {
             layerSizes = new int[reader.BaseStream.Length / 4];
             int pos = 0;
@@ -179,7 +185,7 @@ public class neuralNetwork
             biasChanges[layerNum] = new float[layerSizes[layerNum + 1]];
         }
 
-        using (BinaryReader reader = new BinaryReader(File.Open(biasesPath, FileMode.Open)))
+        using (BinaryReader reader = new BinaryReader(new MemoryStream(biasesAsset.bytes)))
         {
             int i = 0;
             int j = 0;
@@ -218,7 +224,7 @@ public class neuralNetwork
             }
         }
 
-        using (BinaryReader reader = new BinaryReader(File.Open(weightsPath, FileMode.Open)))
+        using (BinaryReader reader = new BinaryReader(new MemoryStream(weightsAsset.bytes)))
         {
             int i = 0;
             int j = 0;
@@ -243,7 +249,6 @@ public class neuralNetwork
 
             }
         }
-
     }
     ///////////////////// end loadInit
 
@@ -453,7 +458,7 @@ public class neuralNetwork
             }
         }
 
-        Debug.Log("Saved to: " + Application.dataPath + "/Resources/NNData");
+        //Debug.Log("Saved to: " + Application.dataPath + "/Resources/NNData");
 
     }
 
