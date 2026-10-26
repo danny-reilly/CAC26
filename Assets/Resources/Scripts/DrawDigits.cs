@@ -27,6 +27,8 @@ public class DrawDigits : MonoBehaviour
     int[,] fixedCenteredGrid;
     public int[] centeredGridArray;
 
+
+
     int lastPixelX, lastPixelY;
     imgGenerator imgGen = new imgGenerator();
     public runNetwork runNetwork;
@@ -74,7 +76,7 @@ public class DrawDigits : MonoBehaviour
         Vector3 worldPosition = Camera.main.ScreenToWorldPoint(screenPos3D);
 
         Vector2 mousePosition = new Vector2(worldPosition.x, worldPosition.y);
-        Vector2 digitCanvasPos = new Vector2((digitCanvas.transform.position.x-960) * 0.00925925925f, (digitCanvas.transform.position.y-540)*0.00925925925f); // decimals convert positions to positions the mouse uses
+        Vector2 digitCanvasPos = new Vector2((digitCanvas.transform.position.x-975)*(1920/Screen.width) * 0.00925925925f, (digitCanvas.transform.position.y-520)*(1080 / Screen.height)*0.00925925925f); // decimals convert positions to positions the mouse uses
 
         // worldspace coords centered on the image
         Vector2 mouseToCanvasRelative = new Vector2((mousePosition.x - digitCanvasPos.x) /0.00925925925f, (mousePosition.y - digitCanvasPos.y) /0.00925925925f);

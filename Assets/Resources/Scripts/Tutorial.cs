@@ -36,6 +36,7 @@ public class Tutorial : MonoBehaviour
         "Explain2",
         "Point2",
         "Point2",
+        "Point",
         "Point"
     };
     public int voiceline = 0;

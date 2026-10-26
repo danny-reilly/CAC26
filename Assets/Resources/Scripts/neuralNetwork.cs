@@ -478,7 +478,7 @@ public class neuralNetwork
 
     public void changeInputs(float[] newInputs)
     {
-        for (int i = 0; i < neurons[0].Length; i++)
+        for (int i = 0; i < newInputs.Length; i++)
         {
            inputs[i] = newInputs[i];
            neurons[0][i] = inputs[i];
