@@ -53,6 +53,7 @@ public class Tutorial : MonoBehaviour
     public Button guessWordBtn, eraseBtn;
     public johnMovement john;
     AudioSource As;
+    public guessWord gw;
 
 
     void Start()
@@ -154,7 +155,8 @@ public class Tutorial : MonoBehaviour
                 {
                     OnTutorialClick();
                     OnTutorialClick();
-
+                    correct = false;
+                    gw.guessingWord = false;
                 }
                 else
                 {
@@ -189,6 +191,8 @@ public class Tutorial : MonoBehaviour
                 {
                     OnTutorialClick();
                     OnTutorialClick();
+                    wrong = false;
+                    gw.guessingWord = false;
                 }
                 else
                 {

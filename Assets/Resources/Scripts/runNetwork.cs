@@ -72,7 +72,7 @@ public class runNetwork : MonoBehaviour
                 gw.guessWordToggle();
             }
             leaderboardText.text = "No pressing buttons\nduring the tutorial!";
-        } else if(!gw.guessingWord)
+        } else if(gw.guessingWord)
         {
             leaderboardText.text = gw.finalWord.Length <= 0 ? startingLeaderboardText : $"Was your word: \"{gw.finalWord}\" ?";
         } else

@@ -2328,6 +2328,7 @@ MonoBehaviour:
   - Aw drat. I guess you can't win em all...
   - If you try again, maybe it'll get it right next time!
   voiceline: 0
+  typing: 0
   tutorialObj: {fileID: 1379637257}
   givingTutorial: 0
   correct: 0
@@ -2336,6 +2337,7 @@ MonoBehaviour:
   guessWordBtn: {fileID: 1451300441}
   eraseBtn: {fileID: 159511122}
   john: {fileID: 2014749765}
+  gw: {fileID: 151950037}
 --- !u!82 &951872935
 AudioSource:
   m_ObjectHideFlags: 0

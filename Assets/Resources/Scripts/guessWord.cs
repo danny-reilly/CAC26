@@ -27,14 +27,13 @@ public class guessWord : MonoBehaviour
     {
         guessList.Add((char)('A' + runNetwork.topChars[0]));
         dd.erase();
-        toggleText.text = guessingWord ? "Guess a Word" : "Guess a Letter";
+        toggleText.text = guessingWord ? "Guess a Letter" : "Guess a Word";
 
     }
     public void onDoneWWordClick()
     {
         dd.erase();
         finalWord = "";
-        guessingWord = false;
         next.gameObject.SetActive(false);
         done.gameObject.SetActive(false);
         space.gameObject.SetActive(false);
@@ -46,7 +45,7 @@ public class guessWord : MonoBehaviour
         runNetwork.leaderboardText.text = $"Was your word: \"{finalWord}\" ?";
         rightWrongObj.SetActive(true);
         guessList.Clear();
-        toggleText.text = guessingWord ? "Guess a Word" : "Guess a Letter";
+        toggleText.text = guessingWord ? "Guess a Letter" : "Guess a Word";
     }
 
     public void AddSpace()
@@ -62,7 +61,9 @@ public class guessWord : MonoBehaviour
         next.gameObject.SetActive(guessingWord);
         done.gameObject.SetActive(guessingWord);
         space.gameObject.SetActive(guessingWord);
+        rightWrongObj.SetActive(false);
         toggleText.text = guessingWord ? "Guess a Letter" : "Guess a Word";
+
     }
 
     public void WordWasRightWrong(bool correct)
